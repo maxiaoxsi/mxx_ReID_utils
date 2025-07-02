@@ -1,0 +1,18 @@
+dataset:
+  path_cfg_list:
+    # mars: './configs/dataset/MARS-v160809/cfg_cache_mars_train.yaml'
+    market: './configs/dataset/Market-1501-v15.09.15/cfg_cache_market_train.yaml'
+    # msmt17: './cfg/msmt17/cfg_cache_msmt_train.yaml'
+    # duke: './cfg/duke/cfg_cache_duke_train.yaml'
+    # cuhk03: './cfg/cuhk03/cfg_cache_cuhk03_train.yaml'
+    # cuhk01: './cfg/cuhk01/cfg_cache_cuhk01_train.yaml'
+    # ilids: './cfg/ilids/cfg_cache_ilids_train.yaml'
+    # prid: './cfg/prid/cfg_cache_prid_train.yaml'
+    # veri: './cfg/veri/cfg_cache_veri_train.yaml'
+    # duke: './humandataset_duke_train.yaml'
+
+path_default: '/Users/curarpikt/Documents/datasets/ReID/Market-1501-v15.09.15'
+
+
+
+

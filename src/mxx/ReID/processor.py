@@ -8,16 +8,19 @@ from .utils.save_data import save_sample
 class ReIDProcessor:
     def __init__(
         self, 
-        dataset:ReIDDataset,
-        is_vl = False
+        dataset=None,
+        is_vl=False
     ):
-        self._dataset = dataset
+        self._dataset = None
+        self._dataset_list = []
+        if dataset is not None:
+            self._dataset = dataset
+            self._dataset_list.append(dataset)
         if is_vl:
             from transformers import Qwen2_5_VLForConditionalGeneration, AutoProcessor
             self._model_qwen = Qwen2_5_VLForConditionalGeneration.from_pretrained(
                 "/machangxiao/hub/Qwen2.5-VL-7B-Instruct", 
                 torch_dtype="auto", 
-                # attn_implementation="flash_attention_2",
                 device_map="cuda"
             )
 
@@ -132,48 +135,47 @@ class ReIDProcessor:
             import time
             time.sleep(5)
         
+    def get_skeleton(self):
+        from ..smplx.painter import Painter
+        painter_mxx = Painter(
+            path_smplx_model='/machangxiao/code/smplx/models'
+        )
+        for i in tqdm(range(self._dataset.get_n_img())):
+            img = self._dataset.get_img(i)
+            painter_mxx(img=img, is_save_skeleton=True, is_save_manikin=True)
+
+    def sort_and_divide_cache(self, dir_cache, name_base, num_divided):
+        import pickle
+        path_cache = os.path.join(dir_cache, f'{name_base}.pkl')
+        with open(path_cache, 'rb') as f:
+            data = pickle.load(f)
+        data['img'] = sorted(data['img'], key=lambda x: x['id_person'])
+        len_slice = len(data['img']) // num_divided
+        idx_st = 0
+        for i in range(num_divided):
+            if i == num_divided - 1:
+                idx_end = len(data['img'])
+            else:
+                idx_end = idx_st + len_slice
+                while idx_end + 1 < len(data['img']) and (data['img'][idx_end]['id_person'] == data['img'][idx_end + 1]['id_person']):
+                    idx_end += 1
+                idx_end += 1
+            data_divided = data['img'][idx_st:idx_end]
+            data_save = {'img':data_divided}
+            with open(os.path.join(dir_cache, f"{name_base}_{i}.pkl") , 'wb') as f:
+                pickle.dump(data_save, f)
+            if (idx_end == len(data['img'])):
+                print(f'{i} is the last one')
+                break
+            idx_st = idx_end
+            
 
 
-    
 
 
 
 
 
-
-
-
-
-
-
-    def cluster_image(self, img_1, img_2, key_tgt,
-        prompt = "Are the person in the two pictures wearing \
-            clothes of the same color? \
-            Only answer 'yes' or 'no'", 
-    ):
-        path_1 = img_1.get_path("reid")
-        path_2 = img_2.get_path("reid")
-        messages = [
-            {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "image",
-                        "image": path_1,
-                    },
-                    {
-                        "type": "image",
-                        "image": path_2
-                    }, 
-                    {
-                        "type": "text", 
-                        "text": prompt
-                    },
-                ],
-            }
-        ]
-        output_text = self.get_qwen_annot(messages)
-        print(output_text)
 
 
                 

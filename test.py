@@ -94,6 +94,9 @@ if __name__ == '__main__':
         dataset=dataset_market,
         # is_vl=True
     )
+
+    processor.get_skeleton()
+    exit()
     processor(
         'overwrite_key', 
         key='is_riding_vl',

@@ -1,8 +1,8 @@
 import torch
 import numpy as np
 import cv2
-from utils.visualization_utils import render_mesh, vis_keypoints_with_skeleton
-from utils.visualization_utils import perspective_projection
+from .utils.visualization_utils import render_mesh, vis_keypoints_with_skeleton
+from .utils.visualization_utils import perspective_projection
 import os
 
 class Painter:
@@ -10,6 +10,7 @@ class Painter:
         import smplx
         self._model = smplx.create(
             path_smplx_model,
+            model_type='smplx',
             gender='neutral', 
             use_face_contour=False,
             num_betas=10,
@@ -73,13 +74,17 @@ class Painter:
                 img_manikin = cv2.imread(path_manikin)
                 img_skeleton = cv2.imread(path_skeleton)
                 return img_manikin, img_skeleton
-
+        if not os.path.exists(path_smplx_pred):
+            return
         data_load = np.load(path_smplx_pred)
 
         betas = torch.from_numpy(data_load['smplx_shape']).float()      # [1, num_betas]
         expression = torch.from_numpy(data_load['smplx_expr']).float()  # [1, num_expression_coeffs]
         global_orient = torch.from_numpy(data_load['smplx_root_pose']).float()  # [1, 3]
         body_pose = torch.from_numpy(data_load['smplx_body_pose']).unsqueeze(0).float() # [1, 21*3] 或 [1, 21, 3]
+        print(body_pose.shape)
+        print(global_orient.shape)
+        exit()
 
         left_hand_pose=torch.from_numpy(data_load['smplx_lhand_pose']).unsqueeze(0).float()
         right_hand_pose=torch.from_numpy(data_load['smplx_rhand_pose']).unsqueeze(0).float()
@@ -91,7 +96,7 @@ class Painter:
 
         focal = data_load['focal'].tolist()
         princpt = data_load['princpt'].tolist()
-
+        
         output = self._model(
             betas=betas, 
             expression=expression,

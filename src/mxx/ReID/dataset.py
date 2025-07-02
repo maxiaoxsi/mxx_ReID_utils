@@ -9,6 +9,7 @@ import numpy as np
 import torch
 import torchvision.transforms as transforms
 import torchvision.transforms.functional as F
+import pickle
 
 from .utils import get_utils
 from .set import PersonSet, ImgSet
@@ -30,6 +31,9 @@ class ReIDDataset(Dataset):
         img_size_pad=(512, 512),
         stage = 1,
         n_frame = 10,
+        is_divide = False,
+        st_divide = 0,
+        ed_divide = -1,
         n_img = ('', ''),
     ) -> None:
         self._img_size_pad=img_size_pad
@@ -47,19 +51,41 @@ class ReIDDataset(Dataset):
 
         self._init_transforms(width_scale, height_scale)
 
-        path_cache = cfg["path_cache"]
-
+        path_cache = cfg["path_cache"] + '.pkl'
         # load cache or init cache and save
         if path_cache is None or not os.path.exists(path_cache):
             cache = self._init_cache()
             if path_cache is not None and is_save:
-                import pickle
                 with open(path_cache, 'wb') as f:
                     pickle.dump(cache, f)
         else:
-            import pickle
-            with open(path_cache, 'rb') as f:
-                cache = pickle.load(f)
+            if is_divide:
+                cache = {"img":[]}
+                n_divide = cfg["n_divide"]
+                if st_divide < 0:
+                    st_divide = 0
+                elif st_divide >= n_divide:
+                    st_divide = n_divide - 1
+                
+                if ed_divide < 0:
+                    ed_divide = 0
+                elif ed_divide >= n_divide:
+                    ed_divide = n_divide - 1
+                
+                if ed_divide < st_divide:
+                    ed_divide = st_divide
+                
+
+                for i in range(st_divide, ed_divide + 1):
+                    path_cache_divide = cfg["path_cache"] + f'_{i}.pkl'
+                    print(path_cache_divide)
+                    with open(path_cache_divide, 'rb') as f:
+                        cache_divide = pickle.load(f)
+                        cache['img'] = cache['img'] + cache_divide['img']
+            else:
+                with open(path_cache, 'rb') as f:
+                    cache = pickle.load(f)
+        
 
         # init person_set, img_set with cache
         self._person_set = PersonSet()

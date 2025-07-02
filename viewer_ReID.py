@@ -1,4 +1,5 @@
 import sys
+from numpy import fft
 import yaml
 import traceback
 from PyQt5.QtWidgets import QApplication
@@ -6,7 +7,7 @@ from PyQt5.QtWidgets import QApplication
 from mxx.ReID import ReIDViewer
 
 if __name__ == '__main__':
-    path_cfg = './cfg_viewer.yaml'
+    path_cfg = './configs/cfg_viewer.yaml'
     with open(path_cfg, 'r') as f:
         cfg = yaml.safe_load(f)
     app = QApplication(sys.argv)
