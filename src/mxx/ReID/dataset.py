@@ -75,7 +75,6 @@ class ReIDDataset(Dataset):
                 if ed_divide < st_divide:
                     ed_divide = st_divide
                 
-
                 for i in range(st_divide, ed_divide + 1):
                     path_cache_divide = cfg["path_cache"] + f'_{i}.pkl'
                     print(path_cache_divide)
@@ -198,6 +197,7 @@ class ReIDDataset(Dataset):
 
     def _load_cfg(self, path_cfg):
         if not os.path.exists(path_cfg):
+            print(path_cfg)
             raise Exception("dataset cfg file not found!")
         with open(path_cfg, 'r') as f:
             cfg = yaml.safe_load(f)

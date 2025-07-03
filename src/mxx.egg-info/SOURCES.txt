@@ -24,7 +24,7 @@ src/mxx/ReID/utils/__init__.py
 src/mxx/ReID/utils/duke.py
 src/mxx/ReID/utils/market.py
 src/mxx/ReID/utils/mars.py
-src/mxx/ReID/utils/msmt17.py
+src/mxx/ReID/utils/msmt.py
 src/mxx/ReID/utils/save_data.py
 src/mxx/ReID/utils/text.py
 src/mxx/ReID/utils/util.py
