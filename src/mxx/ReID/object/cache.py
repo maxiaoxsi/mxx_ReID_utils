@@ -14,8 +14,9 @@ class Cache:
         self._logger = logger
         self._id_dataset = cfg["id_dataset"]
         self._dir = cfg['dir']
-        self._path_cache = cfg["path_cache"] + '.pkl'
+        self._path_cache = cfg["path_cache"]
         self._cache = {}
+
 
         if self._path_cache is None or not os.path.exists(self._path_cache):
             self._create_cache()
