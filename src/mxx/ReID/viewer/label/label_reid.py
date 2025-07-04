@@ -88,12 +88,11 @@ class ReIDLabel(QLabel):
             if img is None or (type_img != 'reid' and not img['is_smplx']):
                 self.setText("without img")
                 return
-            path_img = img.get_path(type_img)
+            # path_img = img.get_path(type_img)
             img_pil = img.get_img_pil(type_img)
             # img_pil = img_pil.convert('RGB')
             img_bytes = img_pil.tobytes('raw', 'RGB')
             w, h = img_pil.size
-            print(f"w={w}, h={h}")
             qimage = QImage(img_bytes, w, h, w * 3, QImage.Format_RGB888)
             pixmap_img = QPixmap(qimage)
             if pixmap_img.isNull():
@@ -104,10 +103,6 @@ class ReIDLabel(QLabel):
             pixmap_img = pixmap_img.scaled(w, target_height, Qt.KeepAspectRatio, Qt.SmoothTransformation)
             self.setPixmap(pixmap_img)
             self.original_pixmap = pixmap_img
-            if label_img is not None:
-                if label_img == 'name_img':
-                    label_img = os.path.basename(path_img)
-                self.setImageName(label_img)  # 设置图片名
             self.adjustSize()
         except Exception as e:
             self.setText(f"load err: {str(e)}")

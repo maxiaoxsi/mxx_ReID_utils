@@ -306,6 +306,7 @@ class ReIDDataset(Dataset):
         type_tgt_sub = type_tgt.split('_')[0]
         if type_tgt_sub in self._dir:
             return self._dir[type_tgt_sub]
+        print(type_tgt)
         raise Exception(f"dataset:unkown dir type:{type_tgt}")
 
     def get_visible(self):
