@@ -38,11 +38,11 @@ class AnnotTable(QTableWidget):
         self._img = img
         key_bool_list = []
         key_str_list = []
-        if hasattr(img, 'get_key_str_list'):
-            key_bool_list = img.get_key_bool_list()
-        if hasattr(img, 'get_key_str_list'):
-            key_str_list = img.get_key_str_list()
 
+        if hasattr(img.annot, 'get_key_str_list'):
+            key_bool_list = img.annot.get_key_bool_list()
+        if hasattr(img.annot, 'get_key_str_list'):
+            key_str_list = img.annot.get_key_str_list()
         self.setRowCount(len(key_bool_list) + len(key_str_list))
 
         # print(key_bool_list)

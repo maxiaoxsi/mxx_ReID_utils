@@ -1,10 +1,8 @@
 dir:
   reid : "/Users/curarpikt/datasets/ReID/Market-1501-v15.09.15/bounding_box_train"
-  smplx : "/Users/curarpikt/datasets/ReID_smplx/withyolo/Market-1501-v15.09.15/bounding_box_train"
+  smplx : "/Users/curarpikt/datasets/ReID_smplx/Market-1501-v15.09.15/bounding_box_train"
   annot: "/Users/curarpikt/datasets/ReID_annot/Market-1501-v15.09.15/bounding_box_train"
   mask: "/Users/curarpikt/datasets/ReID_mask_8/Market-1501-v15.09.15/bounding_box_train"
-  background: "/Users/curarpikt/datasets/ReID_background_8/Market-1501-v15.09.15/bounding_box_train"
-  foreground: "/Users/curarpikt/datasets/ReID_foreground_8/Market-1501-v15.09.15/bounding_box_train"
     
 
 id_dataset: "market" # market_0002

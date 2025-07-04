@@ -10,30 +10,30 @@ from .annotation import Annotation
 
 
 class Img:
-    def __init__(self, dir_sub, name, suff, is_smplx, id_video, 
-                    idx_frame, dataset, person, logger, is_check_annot) -> None:
-        self._dir = dir_sub
-        self._name = name
-        self._suff = suff
-        self._id_video = id_video
-        self._idx_frame = idx_frame
-        self._is_smplx = is_smplx
+    def __init__(
+        self,
+        cache,
+        dataset, 
+        person, 
+        logger, 
+    ) -> None:
+        
+        self._dir_sub = cache["dir_sub"]
+        self._name = cache["name"]
+        self._suff = cache["suff"]
+        # self._is_smplx = cache["is_smplx"]
         self._dataset = dataset
         self._person = person
         self._logger = logger
         self._annot = Annotation(
-            dir_annot=self.get_dir('annot'),
             path_annot=self.get_path('annot'), 
             img=self,
             logger=self._logger, 
-            is_check=is_check_annot,
         )
 
-    def get_annot_dict(self):
+    @property 
+    def annot(self):
         return self._annot
-
-    def get_annot(self, idx):
-        return self._annot.get_annot(idx)
 
     def __getitem__(self, idx):
         return self._annot[idx]
@@ -47,7 +47,7 @@ class Img:
             dir_insert = tgt.split('_')[-1]
         else:
             dir_insert = ''
-        return os.path.join(dir_base, self._dir, dir_insert)
+        return os.path.join(dir_base, self._dir_sub, dir_insert)
 
     def get_path(self, tgt):
         dir_tgt = self.get_dir(tgt)
@@ -68,6 +68,18 @@ class Img:
 
     def get_img_pil(self, type):
         """Return the image as a PIL Image object."""
+        if type in ['background', 'foreground']:
+            path_reid = self.get_path("reid")
+            path_mask = self.get_path("mask")
+            from ...utils.mask import make_back_and_fore_img
+            img_fore, img_back = make_back_and_fore_img(
+                path_reid=path_reid, 
+                path_mask=path_mask
+            )
+            if type == "background":
+                return img_back
+            elif type == "foreground":
+                return img_fore
         path = self.get_path(type)
         if path is None:
             return None
@@ -75,81 +87,50 @@ class Img:
             return None
         return Image.open(path)
 
-    def get_id_video(self):
-        return self._id_video
-    
-    def get_idx_frame(self):
-        return self._idx_frame
-
-    def get_score(self):
+    @property
+    def score(self):
         return self._score 
 
-    '''
-    is smplx img exists
-    '''
-    def is_smplx(self):
-        return self._is_smplx
-    
-    '''
-    is img belong to a video
-    '''
-    def is_video(self):
-        return self._idx_frame is not None
 
-
-    '''
-    riding has to be the same
-    '''
-    def is_match_tgt(self, img_tgt):
-        if self['riding'] != img_tgt['riding']:
-            return False
-        if self['hand-carried'] != img_tgt['hand-carried']:
-            return False
-        self._refresh_score(img_tgt)
-        return True
-
-    
     def calib_score(self, img_tgt):
-        self._score = float(self['mark_drn'] or 0.0)
-        if self['is_riding'] == img_tgt['is_riding']:
-            self._score = self._score + 1
-        if self['is_hand_carried'] == img_tgt['is_hand_carried']:
-            self._score = self._score + 1
-        if self['is_backpack'] == img_tgt['is_backpack']:
-            self._score = self._score + 1
-        if self['color_upper'] == img_tgt['color_upper']:
-            self._score = self._score + 1
-        if self['color_bottoms'] == img_tgt['color_bottoms']:
-            self._score = self._score + 1
-        return
+        self._score = 0
+        for item in [
+            'is_riding', 
+            'is_hand_carried', 
+            'is_backpack', 
+            'color_upper', 
+            'color_bottoms',
+        ]:
+            if self[item] == img_tgt[item]:
+                self._score += 1
     
-    def keys(self):
-        return self._annot.keys()
+    # def keys(self):
+    #     return self._annot.keys()
     
-    def get_key_bool_list(self):
-        return self._annot.get_key_bool_list()
+    # def get_key_bool_list(self):
+    #     return self._annot.get_key_bool_list()
     
-    def get_key_str_list(self):
-        return self._annot.get_key_str_list()
+    # def get_key_str_list(self):
+    #     return self._annot.get_key_str_list()
 
-    def rename_key(self, **kwargs):
-        key = kwargs['key']
-        key_new = kwargs['key_new']
-        self._annot.rename_key(key, key_new)
+    # def rename_key(self, **kwargs):
+    #     key = kwargs['key']
+    #     key_new = kwargs['key_new']
+    #     self._annot.rename_key(key, key_new)
 
-    def remove_key(self, key):
-        self._annot.remove_key(key)
+    # def remove_key(self, key):
+    #     self._annot.remove_key(key)
 
-    def overwrite_key(self, **kwargs):
-        key = kwargs['key']
-        data_check = kwargs['data_check']
-        data_new = kwargs['data_new']
-        self._annot.overwrite_key(key, data_check, data_new)
+    # def overwrite_key(self, **kwargs):
+    #     key = kwargs['key']
+    #     data_check = kwargs['data_check']
+    #     data_new = kwargs['data_new']
+    #     self._annot.overwrite_key(key, data_check, data_new)
 
-    def write_key(self, **kwargs):
-        key = kwargs['key']
-        data = kwargs['data']
-        self._annot.write_annot(key, data)
+    # def write_key(self, **kwargs):
+    #     key = kwargs['key']
+    #     data = kwargs['data']
+    #     self._annot.write_annot(key, data)
 
     def get_text_tgt(self):
         text_ref = self.get_text_ref()

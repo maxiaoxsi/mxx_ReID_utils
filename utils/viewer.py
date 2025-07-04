@@ -4,7 +4,7 @@ import yaml
 import traceback
 from PyQt5.QtWidgets import QApplication
 
-from mxx.ReID import ReIDViewer
+from mxx.ReID.viewer import ReIDViewer
 
 if __name__ == '__main__':
     path_cfg = './configs/cfg_viewer.yaml'

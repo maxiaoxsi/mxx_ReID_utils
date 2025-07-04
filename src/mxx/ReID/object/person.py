@@ -10,37 +10,41 @@ img_set: <list: <object.img>>, img for person
 video_set: <list: <object.video>>, video for person
 '''
 class Person:
-    def __init__(self, id) -> None:
+    def __init__(self, id, cache_img, dataset, logger) -> None:
         self._id = id
+        self._cache_img = cache_img
+        self._img_set = None
+        self._video_set = None
+        self._dataset = dataset
+        self._logger = logger
+        # self._load_cache()
+
+    def _load_cache(self):
         self._img_set = ImgSet()
-        self._video_set = VideoSet()
-
-    def get_id(self):
-        return self._id
-
-    def add_img(self, img:Img):
-        """Add an image to the person's set."""
-        if img.is_smplx():
-            self._img_set.add_img(img)
-        if img.is_video():
-            self._video_set.add_img(img)
-
-    def is_img_set_empty(self):
-        return len(self._img_set) == 0
-
-    def get_img_set_keys(self):
-        return self._img_set.keys()
+        for cache_img in self._cache_img:
+            name_img = cache_img['name']
+            img = Img(
+                cache=cache_img,
+                dataset=self._dataset,
+                person=self,
+                logger=self._logger
+            )
+            self._img_set.add_item(name_img, img)
+        del self._cache_img
+        print("cache loaded")
 
     def get_sample(self, idx_video_tgt, idx_img_tgt, n_frame, stage, is_select_bernl):
         """Get a sample from the person's imgSet or videoSet"""
         """stage1: img, text: visible infrared"""
         """stage2: video"""
         """stage3: infrared only"""
+        if self._img_set == None:
+            self._load_cache()
         if stage in [1, 3]:
             (
                 img_ref_list, 
                 img_tgt_list, 
-                imgList_matched_dict
+                list_img_sorted_dict,
             )= self._get_imgList_from_img_set(
                 stage=stage, 
                 idx_img_tgt=idx_img_tgt,
@@ -66,6 +70,7 @@ class Person:
 
         annot_ref_list = get_annot_list(img_ref_list)
         annot_tgt_list = get_annot_list(img_tgt_list)
+
         return {
             'img_ref_pil_list':img_ref_pil_list,
             'img_tgt_pil_list':img_tgt_pil_list,
@@ -85,14 +90,14 @@ class Person:
             idx_img_tgt=idx_img_tgt,
         )
 
-        img_ref_list, imgList_matched_dict = self._img_set.get_img_ref(
+        img_ref_list, list_img_sorted_dict = self._img_set.get_img_ref(
             stage=stage, 
             img_tgt=img_tgt, 
             is_select_bernl=is_select_bernl
         )
         
         img_tgt_list = [img_tgt]
-        return img_ref_list, img_tgt_list, imgList_matched_dict
+        return img_ref_list, img_tgt_list, list_img_sorted_dict
 
     def _get_imgList_from_video_set(self, stage, idx_video_tgt, idx_img_tgt, n_frame):
         img_ref_list = self._img_set.get_img_ref_list(stage=stage)
@@ -105,10 +110,16 @@ class Person:
     
     def __getitem__(self, idx):
         return self._img_set[idx]
-    
-    def get_video(self, idx):
-        return self._video_set[idx]
 
+    @property
+    def id(self):
+        return self._id
+
+    @property
+    def keys(self):
+        if self._img_set is None:
+            self._load_cache()
+        return self._img_set.keys
 
 
 

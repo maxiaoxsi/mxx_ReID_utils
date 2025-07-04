@@ -15,9 +15,7 @@ def get_text_drn(img):
         text_walk = 'riding'
     else:
         text_walk = 'walking'
-    drn = img.get_annot('drn_smplx')
-    if drn == 'none':
-        drn = img.get_annot('drn_vl')
+    drn = img['drn']
     if drn == 'left':
         return f', {text_walk} from right to left'
     if drn == 'right':

@@ -1,12 +1,9 @@
-
 from tqdm import tqdm
-
-
 from mxx import ReIDProcessor, ReIDDataset
 
 
 if __name__ == '__main__':
-    path_cfg = './humandataset_market_train.yaml'
+    path_cfg = './configs/dataset/Market-1501-v15.09.15/cfg_cache_market_train.yaml'
    
     dataset_market = ReIDDataset(
         path_cfg=path_cfg,

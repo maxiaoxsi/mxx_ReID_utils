@@ -129,7 +129,7 @@ def get_annot_list(img_list):
     annot_list = []
     for img in img_list:
         if img is not None:
-            annot = img.get_annot_dict()
+            annot = img.annot.annot
         else:
             annot = {}
         annot_list.append(annot)

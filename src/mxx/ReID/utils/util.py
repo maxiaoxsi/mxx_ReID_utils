@@ -5,34 +5,12 @@ def get_utils(id_dataset):
     current_package = __name__.rsplit('.', 1)[0]
     # print(current_package)
     # exit()
-    module_name = f".{id_dataset}"
+    module_name = f".version.{id_dataset}"
     module = importlib.import_module(module_name, package=current_package)
     return module
 
-def add_img_by_score(img_matched_list, img):
-    for (i, img_i) in enumerate(img_matched_list):
-        if img.get_score() > img_i.get_score():
-            img_matched_list.insert(i, img)
-            return 
-    img_matched_list.append(img)
-    return
-
-def select_matched_img(img_list, is_select_bernl):
-    if len(img_list) == 0:
-        return None
-    img_selected = None
-    if is_select_bernl:
-        for img in img_list:
-            if random.random() < 0.5:
-                img_selected = img
-                break
-    if img_selected is None:
-        img_selected = img_list[0]
-    return img_selected
-
 def get_mark_direction(a, b):
         return (a * a) / (a * a + b * b)
-
 
 def init_direction(smplx_para):
     import numpy as np

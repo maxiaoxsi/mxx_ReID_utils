@@ -1,6 +1,8 @@
+from math import log
 import os
 import time
 import random
+from torch.utils import data
 import yaml
 from PIL import Image
 from tqdm import tqdm
@@ -11,10 +13,10 @@ import torchvision.transforms as transforms
 import torchvision.transforms.functional as F
 import pickle
 
-from .utils import get_utils
 from .set import PersonSet, ImgSet
 from .object import Person, Img
-from ..log.logger import logger
+from .object.cache import Cache
+from ..log.logger import Logger
 
 class ReIDDataset(Dataset):
     def __init__(
@@ -36,67 +38,30 @@ class ReIDDataset(Dataset):
         ed_divide = -1,
         n_img = ('', ''),
     ) -> None:
-        self._img_size_pad=img_size_pad
+        self._img_size=img_size_pad
         self._stage=stage
         self._n_frame = n_frame
         self._is_select_bernl = is_select_bernl
         self._rate_droupout_ref = rate_dropout_back
         self._rate_droupout_back = rate_dropout_back
-        self._logger = logger(path_log=path_log)
+        self._logger = Logger(path_log=path_log)
 
         cfg = self._load_cfg(path_cfg)
         self._dir = cfg['dir']
         self._id = cfg["id_dataset"]
         self._visible = cfg["visible"]
 
+        cache = Cache(
+            cfg=cfg,
+            logger=self._logger
+        )
+        self._person_set = PersonSet(dataset=self, logger=self._logger)
+        self._person_set.load_cache(cache)
+
+        print(f"load cache from dataset:{self._id}")
+        
         self._init_transforms(width_scale, height_scale)
 
-        path_cache = cfg["path_cache"] + '.pkl'
-        # load cache or init cache and save
-        if path_cache is None or not os.path.exists(path_cache):
-            cache = self._init_cache()
-            if path_cache is not None and is_save:
-                with open(path_cache, 'wb') as f:
-                    pickle.dump(cache, f)
-        else:
-            if is_divide:
-                cache = {"img":[]}
-                n_divide = cfg["n_divide"]
-                if st_divide < 0:
-                    st_divide = 0
-                elif st_divide >= n_divide:
-                    st_divide = n_divide - 1
-                
-                if ed_divide < 0:
-                    ed_divide = 0
-                elif ed_divide >= n_divide:
-                    ed_divide = n_divide - 1
-                
-                if ed_divide < st_divide:
-                    ed_divide = st_divide
-                
-                for i in range(st_divide, ed_divide + 1):
-                    path_cache_divide = cfg["path_cache"] + f'_{i}.pkl'
-                    print(path_cache_divide)
-                    with open(path_cache_divide, 'rb') as f:
-                        cache_divide = pickle.load(f)
-                        cache['img'] = cache['img'] + cache_divide['img']
-            else:
-                with open(path_cache, 'rb') as f:
-                    cache = pickle.load(f)
-        
-
-        # init person_set, img_set with cache
-        self._person_set = PersonSet()
-        self._img_set = ImgSet()
-
-        n_img_st = 0 if n_img[0] == '' else n_img[0]
-        n_img_ed = len(cache['img']) if n_img[1] == '' else n_img[1]
-        if n_img_st >= 0 and n_img_ed > 0 and n_img_st <= n_img_ed:
-            cache['img'] = cache['img'][n_img_st:n_img_ed]
-        
-        self._init_set(cache, is_check_annot=is_check_annot)
-        print(f"load {self.get_n_img()} imgs from dataset:{self._id}")
 
     def __len__(self):
         return len(self._person_set)
@@ -123,7 +88,7 @@ class ReIDDataset(Dataset):
         img_ref_tensor_list = self.get_img_tensor_list(
             img_pil_list=sample['img_ref_pil_list'], 
             type_transforms="ref", 
-            img_size=self._img_size_pad,
+            img_size=self._img_size,
             seed=seed, 
         )
         img_reid_tensor_list = self.get_img_tensor_list(
@@ -137,19 +102,19 @@ class ReIDDataset(Dataset):
             img_pil_list=sample['img_tgt_pil_list'], 
             type_transforms="tgt", 
             seed=seed, 
-            img_size=self._img_size_pad
+            img_size=self._img_size
         )
         img_smplx_tensor_list = self.get_img_tensor_list(
             img_pil_list=sample['img_smplx_pil_list'], 
             type_transforms="smplx", 
             seed=seed, 
-            img_size=self._img_size_pad
+            img_size=self._img_size
         )
         img_background_tensor_list = self.get_img_tensor_list(
             img_pil_list=sample['img_background_pil_list'], 
             type_transforms="background", 
             seed=seed, 
-            img_size=self._img_size_pad
+            img_size=self._img_size
         )
 
         for i in range(len(img_ref_tensor_list)):
@@ -288,19 +253,19 @@ class ReIDDataset(Dataset):
         self._transforms_aug_norm_pad = transforms.Compose(
             [
                 RandomCrop(width_scale, height_scale),
-                Scale1D(self._img_size_pad[0]),
+                Scale1D(self._img_size[0]),
                 transforms.ToTensor(),
                 transforms.Normalize(mean=[0.5], std=[0.5]),
-                PadToBottomRight(target_size=self._img_size_pad, fill=0),
+                PadToBottomRight(target_size=self._img_size, fill=0),
             ]
         )
 
         self._transforms_aug_pad = transforms.Compose(
             [
                 RandomCrop(width_scale, height_scale),
-                Scale1D(self._img_size_pad[0]),
+                Scale1D(self._img_size[0]),
                 transforms.ToTensor(),
-                PadToBottomRight(target_size=self._img_size_pad, fill=0),
+                PadToBottomRight(target_size=self._img_size, fill=0),
             ]
         )
 
@@ -312,62 +277,6 @@ class ReIDDataset(Dataset):
                 # transforms.Normalize(mean=[0.485, 0.456, 0.406],std=[0.229, 0.224, 0.225]),
             ]
         )
-
-    def _init_cache(self):
-        cache = {'img':[]}
-        imgLoader = get_utils(id_dataset=self._id)
-        for root, dirs, files in os.walk(self._dir["reid"]):
-            dir_sub = root[len(self._dir["reid"]) + 1:]
-            for file in files:
-                if file.endswith(('.jpg', '.png')):
-                    name_file = file.split('/')[-1]
-                    suff_file = name_file.split('.')[-1]
-                    name_file = name_file.split('.')[0]
-                    id_person = imgLoader.load_id_person(name_file, dir_sub)
-                    if not id_person.isdigit() or int(id_person) <= 0:
-                        continue
-                    idx_frame = imgLoader.load_idx_frame(name_file)
-                    id_video = imgLoader.load_id_video(name_file)
-                    
-                    path_smplx_guid = os.path.join(self._dir["smplx"], 
-                        dir_sub, 'guidance', f'{name_file}.{suff_file}')
-                    has_smplx = os.path.exists(path_smplx_guid)
-                    img_dict = {
-                        'dir':dir_sub,
-                        'name':name_file,
-                        'suff':suff_file,
-                        'id_person':id_person,
-                        'has_smplx':has_smplx,
-                        'idx_frame':idx_frame,
-                        'id_video':id_video,
-                    }
-                    cache['img'].append(img_dict)
-        return cache
-
-    def _init_set(self, cache, is_check_annot):
-        print(f"load dataset: {self._id}")
-        for img_dict in tqdm(cache['img']):
-            id_person = img_dict['id_person']
-            if id_person not in self._person_set:
-                person = Person(id_person)
-                self._person_set.add_person(person)
-            else:
-                person = self._person_set[id_person]
-            img = Img(
-                dir_sub=img_dict["dir"],
-                name=img_dict["name"],
-                suff=img_dict["suff"],
-                is_smplx=img_dict["has_smplx"],
-                id_video=img_dict["id_video"],
-                idx_frame=img_dict["idx_frame"],
-                dataset=self,
-                person=person,
-                logger=self._logger,
-                is_check_annot=is_check_annot,
-            )
-            person.add_img(img)
-            self._img_set.add_item(f"{img_dict['name']}.{img_dict['suff']}", img)
-        self._person_set.check_empty_item()
 
     def get_n_frame(self):
         return self._n_frame
@@ -387,7 +296,7 @@ class ReIDDataset(Dataset):
         return self._visible
     
     def get_person_keys(self):
-        return self._person_set.keys()
+        return self._person_set.keys
     
     def get_person(self, id_person):
         return self._person_set[id_person]

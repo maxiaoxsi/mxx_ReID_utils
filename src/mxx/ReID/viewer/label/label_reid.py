@@ -77,11 +77,15 @@ class ReIDLabel(QLabel):
 
     def set_img(self, img, type_img, label_img=None):
         try:
-            if img is None:
+            if img is None or (type_img is not 'reid' and not img['is_smplx']):
                 self.setText("without img")
                 return
-            path_img = img.get_path(type_img)
-            pixmap_img = QPixmap(path_img)
+            # path_img = img.get_path(type_img)
+            img_pil = img.get_img_pil(type_img)
+            img_bytes = img_pil.tobytes('raw', 'RGB')
+            w, h = img_pil.size
+            qimage = QImage(img_bytes, w, h, QImage.Format_RGB888)
+            pixmap_img = QPixmap(qimage)
             if pixmap_img.isNull():
                 self.setText("can't load img")
                 return

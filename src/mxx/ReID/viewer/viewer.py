@@ -12,8 +12,6 @@ from PyQt5.QtCore import Qt, QDir, QSize, QRect, QTimer, QThread, pyqtSignal
 
 from .bar.bar_tool import ToolBar
 from .widget.widget_main import MainWidget
-from .label.label_reid import ReIDLabel
-from .table.table_annot import AnnotTable
 from .widget.widget_search import SearchWidget
 from ..dataset import ReIDDataset
 
@@ -98,7 +96,7 @@ class ReIDViewer(QMainWindow):
             
             self._person_selected = self._dataset.get_person(self._id_person_selected)
             self.statusBar().showMessage(f"选中行人ID: {self._id_person_selected}")
-            keys_img = self._person_selected.get_img_set_keys()
+            keys_img = self._person_selected.keys
             self._widget_main.refresh_person_selected(self._id_person_selected, keys_img)
             # self._widget_search._combo_drn.setCurrentText("all")
             self.on_search_drn()

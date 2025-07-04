@@ -4,5 +4,8 @@ def load_id_person(name_person, sub_dir):
 def load_id_video(name_person):
     return None
 
-def load_idx_frame(name_person):
+def load_id_frame(name_person):
     return None
+
+def get_id_person_min():
+    return 1

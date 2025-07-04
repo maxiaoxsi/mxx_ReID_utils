@@ -1,7 +1,7 @@
 import time
 import datetime
 
-class logger:
+class Logger:
     def __init__(self, path_log) -> None:
         self._path_log = path_log
 
