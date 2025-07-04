@@ -1,0 +1,4 @@
+**/*.pkl
+**/*.yaml
+**/__pycache__
+**/*.pyc
