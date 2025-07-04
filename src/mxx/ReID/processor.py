@@ -123,17 +123,6 @@ class ReIDProcessor:
             # print(output_text)
             # exit()
             img.write_annot(key_tgt, output_text[0].lower())
-
-    def test_sample(self, dir, is_norm):
-        for i in range(10):
-            sample = self._dataset['0002']
-            save_sample(
-                sample=sample, 
-                dir_base=os.path.join(dir, f"img_0_{i}"),
-                is_norm=is_norm
-            )
-            import time
-            time.sleep(5)
         
     def get_skeleton(self):
         from ..smplx.painter import Painter

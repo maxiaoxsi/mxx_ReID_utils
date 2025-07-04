@@ -58,7 +58,7 @@ class ImgSet(SetBase):
     def get_img_ref(self, img_tgt, stage, is_select_bernl):
         img_ref_list = []
         list_img_sorted_dict = {}
-        for drn in ["front", "left", "back", "right"]:
+        for drn in ["front", "back", "left", "right"]:
             img_sorted_list = self.get_img_sorted_list(img_tgt, drn)
             list_img_sorted_dict[drn] = img_sorted_list
             from ..utils.sample.sample import select_img_bernl

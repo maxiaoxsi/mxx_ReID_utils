@@ -31,7 +31,6 @@ class PersonSet(SetBase):
                 dataset=self._dataset,
             )
             self.add_item(id_person, person)
-
     
     @property
     def keys(self):

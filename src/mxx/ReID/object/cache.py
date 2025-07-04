@@ -105,7 +105,6 @@ class Cache:
     def person_keys(self):
         return [item['id_person'] for item in self._cache['list_person']]
 
-
     def _create_cache_vid(self, parser):
         print("not finish")
 

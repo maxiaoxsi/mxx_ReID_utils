@@ -24,26 +24,26 @@ class ReIDDataset(Dataset):
         path_cfg, # yaml
         path_log="./log.txt",
         is_save=True,
-        is_check_annot=False,
         is_select_bernl=True,
         rate_dropout_ref=0.2,
         rate_dropout_back=0.2,
+        rate_dropout_smplx=0.2,
         width_scale=(1, 1),
         height_scale=(1, 1),
-        img_size_pad=(512, 512),
+        img_size=(512, 512),
         stage = 1,
         n_frame = 10,
         is_divide = False,
         st_divide = 0,
         ed_divide = -1,
-        n_img = ('', ''),
     ) -> None:
-        self._img_size=img_size_pad
+        self._img_size=img_size
         self._stage=stage
         self._n_frame = n_frame
         self._is_select_bernl = is_select_bernl
-        self._rate_droupout_ref = rate_dropout_back
-        self._rate_droupout_back = rate_dropout_back
+        self._rate_dropout_ref = rate_dropout_ref
+        self._rate_dropout_back = rate_dropout_back
+        self._rate_dropout_smplx = rate_dropout_smplx
         self._logger = Logger(path_log=path_log)
 
         cfg = self._load_cfg(path_cfg)
@@ -104,9 +104,15 @@ class ReIDDataset(Dataset):
             seed=seed, 
             img_size=self._img_size
         )
-        img_smplx_tensor_list = self.get_img_tensor_list(
-            img_pil_list=sample['img_smplx_pil_list'], 
-            type_transforms="smplx", 
+        img_manikin_tensor_list = self.get_img_tensor_list(
+            img_pil_list=sample['img_manikin_pil_list'], 
+            type_transforms="manikin", 
+            seed=seed, 
+            img_size=self._img_size
+        )
+        img_skeleton_tensor_list = self.get_img_tensor_list(
+            img_pil_list=sample['img_skeleton_pil_list'], 
+            type_transforms="manikin", 
             seed=seed, 
             img_size=self._img_size
         )
@@ -118,32 +124,42 @@ class ReIDDataset(Dataset):
         )
 
         for i in range(len(img_ref_tensor_list)):
-            if random.random() < self._rate_droupout_ref:
+            if random.random() < self._rate_dropout_ref:
                 img_ref_tensor_list[i] = torch.zeros_like(img_ref_tensor_list[i])
                 img_reid_tensor_list[i] = torch.zeros_like(img_reid_tensor_list[i])
         
         for i in range(len(img_background_tensor_list)):
-            if random.random() < self._rate_droupout_back:
+            if random.random() < self._rate_dropout_back:
                 img_background_tensor_list[i] = torch.zeros_like(img_background_tensor_list[i])
+
+        for i in range(len(img_manikin_tensor_list)):
+            if random.random() < self._rate_dropout_smplx:
+                img_manikin_tensor_list[i] = torch.zeros_like(img_manikin_tensor_list[i])
+
+        for i in range(len(img_skeleton_tensor_list)):
+            if random.random() < self._rate_dropout_smplx:
+                img_skeleton_tensor_list[i] = torch.zeros_like(img_skeleton_tensor_list[i])
 
         img_ref_tensor = torch.stack(img_ref_tensor_list, dim=0)
         img_reid_tensor = torch.stack(img_reid_tensor_list, dim=0)
         img_tgt_tensor = torch.stack(img_tgt_tensor_list, dim=0)
-        img_smplx_tensor = torch.stack(img_smplx_tensor_list, dim=0)
+        img_manikin_tensor = torch.stack(img_manikin_tensor_list, dim=0)
+        img_skeleton_tensor = torch.stack(img_skeleton_tensor_list, dim=0)
         img_background_tensor = torch.stack(img_background_tensor_list, dim=0)
 
         return  {
             "img_ref_tensor": img_ref_tensor,
             "img_reid_tensor": img_reid_tensor,
             "img_tgt_tensor": img_tgt_tensor,
-            'img_smplx_tensor': img_smplx_tensor,
+            'img_manikin_tensor': img_manikin_tensor,
+            'img_skeleton_tensor': img_skeleton_tensor,
             "img_background_tensor": img_background_tensor,
             'text_ref_list': sample['text_ref_list'],
             'text_tgt_list': sample['text_tgt_list'],
         }
     
     def get_img_tensor_list(self, img_pil_list, type_transforms, img_size, seed = None):
-        if type_transforms in ["ref", "tgt", "background", "smplx"]:
+        if type_transforms in ["ref", "tgt", "background", "manikin", "skeleton"]:
             transforms_img=self._transforms_aug_norm_pad
         elif type_transforms == "reid":
             transforms_img=self._transforms_reid

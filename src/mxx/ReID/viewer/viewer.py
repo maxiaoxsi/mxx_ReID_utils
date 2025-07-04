@@ -45,7 +45,7 @@ class ReIDViewer(QMainWindow):
             try:
                 dataset= ReIDDataset(
                     path_cfg=path_cfg,
-                    img_size_pad=(512, 512),
+                    img_size=(512, 512),
                     stage=1,    
                     is_divide=True,
                     st_divide=1,

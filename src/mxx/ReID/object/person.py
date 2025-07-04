@@ -31,7 +31,6 @@ class Person:
             )
             self._img_set.add_item(name_img, img)
         del self._cache_img
-        print("cache loaded")
 
     def get_sample(self, idx_video_tgt, idx_img_tgt, n_frame, stage, is_select_bernl):
         """Get a sample from the person's imgSet or videoSet"""
@@ -60,7 +59,8 @@ class Person:
         from ..utils.save_data import get_annot_list, get_img_pil_list
         img_ref_pil_list = get_img_pil_list(img_ref_list, "reid")
         img_tgt_pil_list = get_img_pil_list(img_tgt_list, "reid")
-        img_smplx_pil_list = get_img_pil_list(img_tgt_list, "smplx_manikin")
+        img_manikin_pil_list = get_img_pil_list(img_tgt_list, "smplx_manikin")
+        img_skeleton_pil_list = get_img_pil_list(img_tgt_list, "smplx_skeleton")
         img_mask_pil_list = get_img_pil_list(img_tgt_list, "mask")
         img_foreground_pil_list = get_img_pil_list(img_tgt_list, "foreground")
         img_background_pil_list = get_img_pil_list(img_tgt_list, "background")
@@ -74,7 +74,8 @@ class Person:
         return {
             'img_ref_pil_list':img_ref_pil_list,
             'img_tgt_pil_list':img_tgt_pil_list,
-            'img_smplx_pil_list':img_smplx_pil_list,
+            'img_manikin_pil_list':img_manikin_pil_list,
+            'img_skeleton_pil_list':img_skeleton_pil_list,
             'img_mask_pil_list':img_mask_pil_list,
             'img_foreground_pil_list':img_foreground_pil_list,
             'img_background_pil_list':img_background_pil_list,

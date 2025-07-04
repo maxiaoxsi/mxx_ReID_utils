@@ -6,39 +6,44 @@ import yaml
 import random
 import torch
 
-def save_item(dataset, id_person, idx_video_tgt, idx_img_tgt, dir_base):
+def save_item(dataset, id_person, idx_video_tgt, idx_img_tgt, dir_base, is_select_bernl):
     person = dataset._person_set[id_person]
     sample = person.get_sample(
         idx_video_tgt=idx_video_tgt,
         idx_img_tgt=idx_img_tgt,
         n_frame=dataset.get_n_frame(),
-        stage=dataset.get_stage()
+        stage=dataset.get_stage(),
+        is_select_bernl = is_select_bernl,
     )
     img_ref_pil_list = sample["img_ref_pil_list"]
     img_tgt_pil_list = sample["img_tgt_pil_list"]
-    img_smplx_pil_list = sample["img_smplx_pil_list"]
+    img_manikin_pil_list = sample["img_manikin_pil_list"]
+    img_skeleton_pil_list = sample["img_skeleton_pil_list"]
     img_mask_pil_list = sample["img_mask_pil_list"]
     img_foreground_pil_list = sample["img_foreground_pil_list"]
     img_background_pil_list = sample["img_background_pil_list"]
     text_ref_list = sample["text_ref_list"]
     text_tgt_list = sample["text_tgt_list"]
-    dscrpt_ref_list = sample["dscrpt_ref_list"]
-    dscrpt_tgt_list = sample["dscrpt_tgt_list"]
-    save_img_pil(img_ref_pil_list, dscrpt_ref_list, dir_base, "reid")
-    save_img_pil(img_tgt_pil_list, dscrpt_tgt_list, dir_base, "tgt")
-    save_img_pil(img_smplx_pil_list, dscrpt_tgt_list, dir_base, "smplx")
-    save_img_pil(img_mask_pil_list, dscrpt_tgt_list, dir_base, "mask")
-    save_img_pil(img_background_pil_list, dscrpt_tgt_list, dir_base, "background")
-    save_img_pil(img_foreground_pil_list, dscrpt_tgt_list, dir_base, "foreground")
-    save_dscrpt_list(dscrpt_ref_list, dir_base, "dscrpt_ref")
-    save_dscrpt_list(dscrpt_tgt_list, dir_base, "dscrpt_tgt")
-
+    annot_ref_list = sample["annot_ref_list"]
+    annot_tgt_list = sample["annot_tgt_list"]
+    save_img_pil(img_ref_pil_list, annot_ref_list, dir_base, "reid")
+    save_img_pil(img_tgt_pil_list, annot_tgt_list, dir_base, "tgt")
+    save_img_pil(img_manikin_pil_list, annot_tgt_list, dir_base, "manikin")
+    save_img_pil(img_skeleton_pil_list, annot_tgt_list, dir_base, "skeleton")
+    save_img_pil(img_mask_pil_list, annot_tgt_list, dir_base, "mask")
+    save_img_pil(img_background_pil_list, annot_tgt_list, dir_base, "background")
+    save_img_pil(img_foreground_pil_list, annot_tgt_list, dir_base, "foreground")
+    save_dscrpt_list(annot_ref_list, dir_base, "dscrpt_ref")
+    save_dscrpt_list(annot_tgt_list, dir_base, "dscrpt_tgt")
+    save_text_list(text_ref_list, dir_base, 'reid', False)
+    save_text_list(text_tgt_list, dir_base, 'tgt', False)
 
 def save_sample(sample, dir_base, is_norm):
         img_ref_tensor = sample['img_ref_tensor']
         img_reid_tensor = sample['img_reid_tensor']
         img_tgt_tensor = sample['img_tgt_tensor']
-        img_smplx_tensor = sample['img_smplx_tensor']
+        img_manikin_tensor = sample['img_manikin_tensor']
+        img_skeleton_tensor = sample['img_skeleton_tensor']
         img_background_tensor = sample['img_background_tensor']
         text_ref_list = sample['text_ref_list']
         text_tgt_list = sample['text_tgt_list']
@@ -46,12 +51,11 @@ def save_sample(sample, dir_base, is_norm):
         save_img_tensor(img_reid_tensor, dir_base, "reid", True, is_norm)
         save_img_tensor(img_tgt_tensor, dir_base, "tgt", True, is_norm)
         save_img_tensor(img_ref_tensor, dir_base, "ref", True, is_norm)
-        save_img_tensor(img_smplx_tensor, dir_base, "smplx", True, is_norm)
+        save_img_tensor(img_manikin_tensor, dir_base, "manikin", True, is_norm)
+        save_img_tensor(img_skeleton_tensor, dir_base, "skeleton", True, is_norm)
         save_img_tensor(img_background_tensor, dir_base, "background", True, is_norm)
         save_text_list(text_ref_list, dir_base, 'ref', False)
         save_text_list(text_tgt_list, dir_base, 'tgt', False)
-
-
 
 def save_text_list(text_list, dir_base, dir_sub, is_rm):
     dir_save = os.path.join(dir_base, dir_sub)
@@ -123,7 +127,6 @@ def save_img_tensor(img_tensor, dir_base, dir_sub, is_rm, is_norm):
         img_pil = to_pil(img)
         path_img = os.path.join(dir_save, f"img_{i}.jpg")
         img_pil.save(path_img)
-
 
 def get_annot_list(img_list):
     annot_list = []
