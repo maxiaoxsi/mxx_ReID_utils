@@ -46,10 +46,7 @@ class ReIDViewer(QMainWindow):
                 dataset= ReIDDataset(
                     path_cfg=path_cfg,
                     img_size=(512, 512),
-                    stage=1,    
-                    is_divide=True,
-                    st_divide=1,
-                    ed_divide=1,         
+                    stage=1,           
                 )
                 self._dataset_dict[name_dataset] = dataset
                 if i == 0:

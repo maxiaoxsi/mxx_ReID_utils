@@ -27,6 +27,14 @@ class ReIDLabel(QLabel):
         self.image_name = name
         self.update()  # 触发重绘
         
+
+    def resizeEvent(self, event):
+        if self.original_pixmap:
+            label_size = self.size()
+            pixmap_img = self.original_pixmap.scaled(label_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            self.setPixmap(pixmap_img)
+        super().resizeEvent(event)
+
     def paintEvent(self, event):
         """重写绘制事件，添加图片名标签"""
         super().paintEvent(event)
@@ -77,20 +85,25 @@ class ReIDLabel(QLabel):
 
     def set_img(self, img, type_img, label_img=None):
         try:
-            if img is None or (type_img is not 'reid' and not img['is_smplx']):
+            if img is None or (type_img != 'reid' and not img['is_smplx']):
                 self.setText("without img")
                 return
-            # path_img = img.get_path(type_img)
+            path_img = img.get_path(type_img)
             img_pil = img.get_img_pil(type_img)
+            # img_pil = img_pil.convert('RGB')
             img_bytes = img_pil.tobytes('raw', 'RGB')
             w, h = img_pil.size
-            qimage = QImage(img_bytes, w, h, QImage.Format_RGB888)
+            print(f"w={w}, h={h}")
+            qimage = QImage(img_bytes, w, h, w * 3, QImage.Format_RGB888)
             pixmap_img = QPixmap(qimage)
             if pixmap_img.isNull():
                 self.setText("can't load img")
                 return
+            target_height = 128
+            w = int(pixmap_img.width() * (target_height / pixmap_img.height()))
+            pixmap_img = pixmap_img.scaled(w, target_height, Qt.KeepAspectRatio, Qt.SmoothTransformation)
             self.setPixmap(pixmap_img)
-            self._scale_factor = 1#self.scale_factor
+            self.original_pixmap = pixmap_img
             if label_img is not None:
                 if label_img == 'name_img':
                     label_img = os.path.basename(path_img)
