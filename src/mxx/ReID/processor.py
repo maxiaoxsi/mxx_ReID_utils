@@ -2,7 +2,7 @@ import os
 import numpy as np
 from tqdm import tqdm
 from .dataset import ReIDDataset
-from .utils.save_data import save_sample
+from .utils.data import save_sample
 
 
 class ReIDProcessor:
@@ -97,17 +97,7 @@ class ReIDProcessor:
         ]
         return messages
 
-    def get_annot_img(self, key_tgt, prompt):
-        for i in tqdm(range(self._dataset.get_num_img())):
-            img = self._dataset.get_img(i)
-            messages = self.get_messages(
-                img_list=[img],
-                img_tgt=None,
-                key_annot_list=None,
-                prompt=prompt
-            )
-            output_text = self.get_qwen_annot(messages)
-            img.write_annot(key_tgt, output_text[0].lower())
+    
 
     def get_annot_annot(self, key_annot_list, key_tgt, prompt):
         for i in tqdm(range(self._dataset.get_num_img())):
@@ -131,33 +121,7 @@ class ReIDProcessor:
         )
         for i in tqdm(range(self._dataset.get_n_img())):
             img = self._dataset.get_img(i)
-            painter_mxx(img=img, is_save_skeleton=True, is_save_manikin=True)
-
-    def sort_and_divide_cache(self, dir_cache, name_base, num_divided):
-        import pickle
-        path_cache = os.path.join(dir_cache, f'{name_base}.pkl')
-        with open(path_cache, 'rb') as f:
-            data = pickle.load(f)
-        data['img'] = sorted(data['img'], key=lambda x: x['id_person'])
-        len_slice = len(data['img']) // num_divided
-        idx_st = 0
-        for i in range(num_divided):
-            if i == num_divided - 1:
-                idx_end = len(data['img'])
-            else:
-                idx_end = idx_st + len_slice
-                while idx_end + 1 < len(data['img']) and (data['img'][idx_end]['id_person'] == data['img'][idx_end + 1]['id_person']):
-                    idx_end += 1
-                idx_end += 1
-            data_divided = data['img'][idx_st:idx_end]
-            data_save = {'img':data_divided}
-            with open(os.path.join(dir_cache, f"{name_base}_{i}.pkl") , 'wb') as f:
-                pickle.dump(data_save, f)
-            if (idx_end == len(data['img'])):
-                print(f'{i} is the last one')
-                break
-            idx_st = idx_end
-            
+            painter_mxx(img=img, is_save_skeleton=True, is_save_manikin=True)        
 
 
 

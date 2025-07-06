@@ -89,6 +89,3 @@ class Annotation(AnnotBase):
         self._annot.pop(key, None)
         self._annot[key_new] = item 
         self._save_annot()
-
-
-    

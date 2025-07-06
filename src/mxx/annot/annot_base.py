@@ -83,6 +83,8 @@ class AnnotBase:
             self._logger(f"[annotation] [overwrite_key] img: {self._img.get_name()}, key: {key}, data_old: {data_old}, value_new: {value_new}")
             return 
 
+    def __contains__(self, key):
+        return key in self._annot
 
     @property
     def annot(self):

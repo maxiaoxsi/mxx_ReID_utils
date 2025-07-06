@@ -56,7 +56,7 @@ class Person:
                 idx_img_tgt=idx_img_tgt,
                 n_frame=n_frame
             )
-        from ..utils.save_data import get_annot_list, get_img_pil_list
+        from ..utils.data import get_annot_list, get_img_pil_list
         img_ref_pil_list = get_img_pil_list(img_ref_list, "reid")
         img_tgt_pil_list = get_img_pil_list(img_tgt_list, "reid")
         img_manikin_pil_list = get_img_pil_list(img_tgt_list, "smplx_manikin")

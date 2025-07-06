@@ -104,15 +104,8 @@ class Img:
             if self[item] == img_tgt[item]:
                 self._score += 1
     
-    # def keys(self):
-    #     return self._annot.keys()
     
-    # def get_key_bool_list(self):
-    #     return self._annot.get_key_bool_list()
     
-    # def get_key_str_list(self):
-    #     return self._annot.get_key_str_list()
-
     # def rename_key(self, **kwargs):
     #     key = kwargs['key']
     #     key_new = kwargs['key_new']

@@ -4,44 +4,7 @@ from tqdm import tqdm
 
 from mxx import ReIDProcessor, ReIDDataset
 
-def init_prompts():
-    prompts = {}
 
-    prompts["bottoms_vl"] = "Could you please describe \
-            the color and style of the bottoms of the people? \
-            Answer with a brief phrase 'color' + 'style'\
-            such as  'black jeans'. \
-            A brief phrase is enough, no full sentences."
-    
-    prompts["upper_vl"] = "Could you please describe \
-            the color and style of the upper clothing of the people? \
-            Answer with a brief phrase 'color' + 'style'\
-            such as  'white t-shirt'. \
-            A brief phrase is enough, no full sentences."
-
-    prompts["color_upper_vl"] = "Could you please describe \
-        the color of the upper clothing from the text?\
-        Answer with a brief phrase 'color' from phrase 'color' + 'style'\
-        such as answer 'white' when the text is 'white t-shirt'. \
-        A brief phrase is enough, no full sentences."
-
-    prompts["color_bottoms_vl"] = "Could you please describe \
-        the color of the bottoms from the text?\
-        Answer with a brief phrase 'color' from phrase 'color' + 'style'\
-        such as answer 'red' when the text is 'red shorts'. \
-        A brief phrase is enough, no full sentences."
-
-    prompts["is_shoulder_bag_vl"] = "Could you please describe \
-        is the person in the photo carrying a shoulder bag?\
-        please anwser with a brief phrase 'yes' or 'no'"
-    
-    prompts["is_hand_carried_vl"] = "Could you please describe \
-        is the person in the photo carrying some object in his or her hand?\
-        Attention that only the object carried on his hand,\
-        the backpack and shoulder bag not count!\
-        please anwser with a brief phrase 'yes' or 'no'"
-
-    return prompts
 
 def get_annots(processor, prompts):
     processor.get_annot_img(

@@ -41,7 +41,8 @@ def save_item(dataset, id_person, idx_video_tgt, idx_img_tgt, dir_base, is_selec
 def save_sample(sample, dir_base, is_norm):
         img_ref_tensor = sample['img_ref_tensor']
         img_reid_tensor = sample['img_reid_tensor']
-        img_tgt_tensor = sample['img_tgt_tensor']
+        if 'img_tgt_tensor' in sample:
+            img_tgt_tensor = sample['img_tgt_tensor']
         img_manikin_tensor = sample['img_manikin_tensor']
         img_skeleton_tensor = sample['img_skeleton_tensor']
         img_background_tensor = sample['img_background_tensor']
@@ -49,13 +50,16 @@ def save_sample(sample, dir_base, is_norm):
         text_tgt_list = sample['text_tgt_list']
         save_img_tensor(img_ref_tensor, dir_base, "ref", True, is_norm)
         save_img_tensor(img_reid_tensor, dir_base, "reid", True, is_norm)
-        save_img_tensor(img_tgt_tensor, dir_base, "tgt", True, is_norm)
+        if 'img_tgt_tensor' in sample:
+            save_img_tensor(img_tgt_tensor, dir_base, "tgt", True, is_norm)
         save_img_tensor(img_ref_tensor, dir_base, "ref", True, is_norm)
         save_img_tensor(img_manikin_tensor, dir_base, "manikin", True, is_norm)
         save_img_tensor(img_skeleton_tensor, dir_base, "skeleton", True, is_norm)
         save_img_tensor(img_background_tensor, dir_base, "background", True, is_norm)
         save_text_list(text_ref_list, dir_base, 'ref', False)
-        save_text_list(text_tgt_list, dir_base, 'tgt', False)
+        if 'img_tgt_tensor' not in sample:
+            os.makedirs(os.path.join(dir_base, 'tgt'), exist_ok=True)
+            save_text_list(text_tgt_list, dir_base, 'tgt', False)
 
 def save_text_list(text_list, dir_base, dir_sub, is_rm):
     dir_save = os.path.join(dir_base, dir_sub)
@@ -145,4 +149,49 @@ def get_img_pil_list(img_list, type_img):
         else None
         for img in img_list 
     ]
+
+def load_samples(samples, bs):
+    samples_id_person = []
+    samples_list = []
+    from ...utils import group_by_bs
+    for id_person in samples:
+        samples_id_person.append(id_person)
+        samples_list.append(samples[id_person])
+    dir_batch = group_by_bs(samples_id_person, bs)
+    sample_batch = group_by_bs(samples_list, bs) 
+    samples = []
+    for batch in sample_batch:
+        img_ref_tensor_list = []
+        img_reid_tensor_list = []
+        img_manikin_tensor_list = []
+        img_skeleton_tensor_list = []
+        img_background_tensor_list = []
+        text_ref_list = []
+        text_tgt_list = []
+        for sample in batch:
+            img_ref_tensor_list.append(sample['img_ref_tensor'])
+            img_reid_tensor_list.append(sample['img_reid_tensor'])
+            img_manikin_tensor_list.append(sample['img_manikin_tensor'])
+            img_skeleton_tensor_list.append(sample['img_skeleton_tensor'])
+            img_background_tensor_list.append(sample['img_background_tensor'])
+            for text_ref in sample['text_ref_list']:
+                text_ref_list.append(text_ref)
+            for text_tgt in sample['text_tgt_list']:
+                text_tgt_list.append(text_tgt)
+        img_ref_tensor = torch.stack(img_ref_tensor_list, dim=0)
+        img_reid_tensor = torch.stack(img_reid_tensor_list, dim=0)
+        img_manikin_tensor = torch.stack(img_manikin_tensor_list, dim=0)
+        img_skeleton_tensor = torch.stack(img_skeleton_tensor_list, dim=0)
+        img_background_tensor = torch.stack(img_background_tensor_list, dim=0)
+        sample_batch = {
+            'img_ref_tensor': img_ref_tensor,
+            'img_reid_tensor': img_reid_tensor,
+            'img_manikin_tensor': img_manikin_tensor,
+            'img_skeleton_tensor': img_skeleton_tensor,
+            'img_background_tensor': img_background_tensor,
+            'text_ref_list': text_ref_list,
+            'text_tgt_list': text_tgt_list
+        }
+        samples.append(sample_batch)
+    return samples, dir_batch
 

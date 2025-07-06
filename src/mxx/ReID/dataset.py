@@ -73,6 +73,95 @@ class ReIDDataset(Dataset):
             idx_video_tgt=-1,
         )
 
+    def load_img_from_dir(self, dir_person, type_transforms, img_size, type_img = None):
+        img_pil_list = []
+        if type_img is None:
+            dir_img = os.path.join(dir_person, type_transforms)
+        else:
+            dir_img = os.path.join(dir_person, type_img)
+        
+        for path in os.listdir(dir_img):
+            if not path.endswith((".jpg", ".png", ".jpeg")):
+                continue
+            path_img = os.path.join(dir_img, path)
+            img_pil = Image.open(path_img)
+            if len(set(img_pil.getdata())) == 1:
+                img_pil = None
+            img_pil_list.append(img_pil)
+        img_tensor_list = self.get_img_tensor_list(
+            img_pil_list=img_pil_list, 
+            type_transforms=type_transforms, 
+            img_size=img_size,
+            seed=None,
+        )
+        img_tensor = torch.stack(img_tensor_list, dim=0)
+        return img_tensor
+
+    def load_text_from_dir(self, dir_person, type_list):
+        text_list = []
+        dir_text = os.path.join(dir_person, type_list)
+        for path in os.listdir(dir_text):
+            if not path.endswith(".txt"):
+                continue
+            path_text = os.path.join(dir_text, path)
+            with open(path_text, 'r') as f:
+                text = f.read().strip()
+            text_list.append(text)
+        return text_list
+
+    def load_sample_from_dir(self, dir_sample):
+        samples = {}
+        for dir in os.listdir(dir_sample):
+            dir_person = os.path.join(dir_sample, dir)
+            if not os.path.isdir(dir_person):
+                continue
+            img_reid_tensor = self.load_img_from_dir(
+                dir_person=dir_person,
+                type_transforms="reid",
+                img_size=(128, 256),
+            )
+            img_ref_tensor = self.load_img_from_dir(
+                dir_person=dir_person,
+                type_img="reid",
+                type_transforms="ref",
+                img_size=self._img_size,
+            )
+            img_background_tensor = self.load_img_from_dir(
+                dir_person=dir_person,
+                type_transforms="background",
+                img_size=self._img_size,
+            )
+            img_manikin_tensor = self.load_img_from_dir(
+                dir_person=dir_person,
+                type_transforms="manikin",
+                img_size=self._img_size,
+            )
+            img_skeleton_tensor = self.load_img_from_dir(
+                dir_person=dir_person,
+                type_transforms="skeleton",
+                img_size=self._img_size,
+            )
+            text_ref_list = self.load_text_from_dir(
+                dir_person=dir_person,
+                type_list = "reid",
+            )
+            text_tgt_list = self.load_text_from_dir(
+                dir_person=dir_person,
+                type_list = "tgt",
+            )
+            sample = {
+                "img_ref_tensor": img_ref_tensor,
+                "img_reid_tensor": img_reid_tensor,
+                'img_manikin_tensor': img_manikin_tensor,
+                'img_skeleton_tensor': img_skeleton_tensor,
+                "img_background_tensor": img_background_tensor,
+                'text_ref_list': text_ref_list,
+                'text_tgt_list': text_tgt_list,
+            }
+            samples[dir_person] = sample
+        return samples
+            
+
     def get_item(self, id_person, idx_img_tgt, idx_video_tgt):
         person = self._person_set[id_person]
         if not isinstance(person, Person):
@@ -112,7 +201,7 @@ class ReIDDataset(Dataset):
         )
         img_skeleton_tensor_list = self.get_img_tensor_list(
             img_pil_list=sample['img_skeleton_pil_list'], 
-            type_transforms="manikin", 
+            type_transforms="skeleton", 
             seed=seed, 
             img_size=self._img_size
         )
@@ -132,13 +221,11 @@ class ReIDDataset(Dataset):
             if random.random() < self._rate_dropout_back:
                 img_background_tensor_list[i] = torch.zeros_like(img_background_tensor_list[i])
 
-        for i in range(len(img_manikin_tensor_list)):
-            if random.random() < self._rate_dropout_smplx:
-                img_manikin_tensor_list[i] = torch.zeros_like(img_manikin_tensor_list[i])
-
-        for i in range(len(img_skeleton_tensor_list)):
-            if random.random() < self._rate_dropout_smplx:
-                img_skeleton_tensor_list[i] = torch.zeros_like(img_skeleton_tensor_list[i])
+        # for i in range(len(img_manikin_tensor_list)):
+        #     if random.random() < self._rate_dropout_smplx:
+        #         img_skeleton_tensor_list[i] = torch.zeros_like(img_skeleton_tensor_list[i])
+        #     elif random.random() < self._rate_dropout_smplx:
+        #         img_manikin_tensor_list[i] = torch.zeros_like(img_manikin_tensor_list[i])
 
         img_ref_tensor = torch.stack(img_ref_tensor_list, dim=0)
         img_reid_tensor = torch.stack(img_reid_tensor_list, dim=0)
