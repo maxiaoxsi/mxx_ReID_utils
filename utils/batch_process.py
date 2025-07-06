@@ -17,9 +17,9 @@ def annot_upper_vl_batch(path_cfg):
     process_batch(
         path_cfg=path_cfg, 
         name_proc="annot_upper_vl", 
-        method_proc_file=annot_upper_vl,  
+        method=annot_upper_vl,  
         batch_size=128,
-        max_workers=8,
+        max_workers=4,
     )
 
 def render_skeleton_batch(path_cfg):
@@ -29,7 +29,7 @@ def render_skeleton_batch(path_cfg):
         name_proc="render_skeleton", 
         method=render_skeleton,  
         batch_size=128,
-        max_workers=8,
+        max_workers=4,
     )
 
 def annot_drn_smplx_batch(path_cfg):
@@ -64,6 +64,7 @@ if __name__ == '__main__':
     # render_skeleton(path_cfg)
     # make_mask(path_cfg)
     # annot_upper_vl_batch(path_cfg)
-    render_skeleton_batch(path_cfg=path_cfg)
+    # render_skeleton_batch(path_cfg=path_cfg)
+    annot_upper_vl_batch(path_cfg)
     
 
