@@ -9,3 +9,6 @@ def load_idx_frame(name_person):
 
 def get_id_person_min():
     return 1
+
+def get_type_dataset():
+    return 'vid'

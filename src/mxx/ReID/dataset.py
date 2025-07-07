@@ -1,3 +1,4 @@
+from ast import arg
 from math import log
 import os
 import time
@@ -13,10 +14,11 @@ import torchvision.transforms as transforms
 import torchvision.transforms.functional as F
 import pickle
 
-from .set import PersonSet, ImgSet
+from .set import PersonSet, ImgSet, VidPersonSet
 from .object import Person, Img
 from .object.cache import Cache
 from ..log.logger import Logger
+from .utils.path import load_cfg
 
 class ReIDDataset(Dataset):
     def __init__(
@@ -46,16 +48,18 @@ class ReIDDataset(Dataset):
         self._rate_dropout_smplx = rate_dropout_smplx
         self._logger = Logger(path_log=path_log)
 
-        cfg = self._load_cfg(path_cfg)
+        cfg = load_cfg(path_cfg)
         self._dir = cfg['dir']
         self._id = cfg["id_dataset"]
-        self._visible = cfg["visible"]
 
         cache = Cache(
             cfg=cfg,
             logger=self._logger
         )
-        self._person_set = PersonSet(dataset=self, logger=self._logger)
+        if cache.type == 'img':
+            self._person_set = PersonSet(dataset=self, logger=self._logger)
+        elif cache.type == 'vid':
+            self._person_set = VidPersonSet
         self._person_set.load_cache(cache)
 
         print(f"load cache from dataset:{self._id}")
@@ -159,8 +163,7 @@ class ReIDDataset(Dataset):
                 'text_tgt_list': text_tgt_list,
             }
             samples[dir_person] = sample
-        return samples
-            
+        return samples   
 
     def get_item(self, id_person, idx_img_tgt, idx_video_tgt):
         person = self._person_set[id_person]
@@ -212,27 +215,20 @@ class ReIDDataset(Dataset):
             img_size=self._img_size
         )
 
-        for i in range(len(img_ref_tensor_list)):
-            if random.random() < self._rate_dropout_ref:
-                img_ref_tensor_list[i] = torch.zeros_like(img_ref_tensor_list[i])
-                img_reid_tensor_list[i] = torch.zeros_like(img_reid_tensor_list[i])
-        
-        for i in range(len(img_background_tensor_list)):
-            if random.random() < self._rate_dropout_back:
-                img_background_tensor_list[i] = torch.zeros_like(img_background_tensor_list[i])
-
-        # for i in range(len(img_manikin_tensor_list)):
-        #     if random.random() < self._rate_dropout_smplx:
-        #         img_skeleton_tensor_list[i] = torch.zeros_like(img_skeleton_tensor_list[i])
-        #     elif random.random() < self._rate_dropout_smplx:
-        #         img_manikin_tensor_list[i] = torch.zeros_like(img_manikin_tensor_list[i])
-
-        img_ref_tensor = torch.stack(img_ref_tensor_list, dim=0)
-        img_reid_tensor = torch.stack(img_reid_tensor_list, dim=0)
-        img_tgt_tensor = torch.stack(img_tgt_tensor_list, dim=0)
-        img_manikin_tensor = torch.stack(img_manikin_tensor_list, dim=0)
-        img_skeleton_tensor = torch.stack(img_skeleton_tensor_list, dim=0)
-        img_background_tensor = torch.stack(img_background_tensor_list, dim=0)
+        (
+            img_ref_tensor, 
+            img_reid_tensor
+        ) = self._get_img_tensor(
+            rate=self._rate_dropout_ref,
+            args_img=(img_ref_tensor_list, img_reid_tensor_list)
+        )
+        img_tgt_tensor = self._get_img_tensor(None, img_tgt_tensor_list)
+        img_manikin_tensor = self._get_img_tensor(None, img_manikin_tensor_list)
+        img_skeleton_tensor = self._get_img_tensor(None, img_skeleton_tensor_list)
+        img_background_tensor = self._get_img_tensor(
+            rate=self._rate_dropout_back,
+            args_img=img_background_tensor_list,
+        )
 
         return  {
             "img_ref_tensor": img_ref_tensor,
@@ -245,6 +241,13 @@ class ReIDDataset(Dataset):
             'text_tgt_list': sample['text_tgt_list'],
         }
     
+    def _get_img_tensor(self, rate, args_img):
+        for i in range(len(args_img[0])):
+            if rate is not None and random.random() < rate:
+                for img_tensor_list in args_img:
+                    img_tensor_list[i] = torch.zeros_like(img_tensor_list[i])
+        return (torch.stack(item, dim=0) for item in args_img)
+
     def get_img_tensor_list(self, img_pil_list, type_transforms, img_size, seed = None):
         if type_transforms in ["ref", "tgt", "background", "manikin", "skeleton"]:
             transforms_img=self._transforms_aug_norm_pad
@@ -262,32 +265,6 @@ class ReIDDataset(Dataset):
             else:
                 img_tensor_list.append(transforms_img(img))
         return img_tensor_list
-
-    def _load_cfg(self, path_cfg):
-        if not os.path.exists(path_cfg):
-            print(path_cfg)
-            raise Exception("dataset cfg file not found!")
-        with open(path_cfg, 'r') as f:
-            cfg = yaml.safe_load(f)
-        if 'dir' not in cfg:
-            raise Exception("dir not in dataset cfg file!")
-        self._check_cfg_dir(cfg['dir']['reid'])
-        self._check_cfg_dir(cfg['dir']['smplx'])
-        self._check_cfg_dir(cfg['dir']['annot'])
-        self._check_cfg_dir(cfg['dir']['mask'])
-        return cfg
-
-    def _check_cfg_dir(self, dir):
-        if not os.path.exists(dir):
-            raise Exception(f"dir:{dir} not exists!")
-
-    def _analyse_id_dataset(self, dir_reid):
-        if "market" in dir_reid.lower():
-            return "market"
-        if "mars" in dir_reid.lower():
-            return "market"
-        if "msmt17" in dir_reid.lower():
-            return "msmt17"
 
     def _init_transforms(self, width_scale, height_scale):
         class Scale2D:
@@ -381,12 +358,6 @@ class ReIDDataset(Dataset):
             ]
         )
 
-    def get_n_frame(self):
-        return self._n_frame
-    
-    def get_stage(self):
-        return self._stage
-
     def get_dir(self, type_tgt):
         if type_tgt in self._dir:
             return self._dir[type_tgt]
@@ -396,17 +367,18 @@ class ReIDDataset(Dataset):
         print(type_tgt)
         raise Exception(f"dataset:unkown dir type:{type_tgt}")
 
-    def get_visible(self):
-        return self._visible
-    
-    def get_person_keys(self):
-        return self._person_set.keys
-    
     def get_person(self, id_person):
         return self._person_set[id_person]
-    
-    def get_n_img(self):
-        return len(self._img_set)
 
-    def get_img(self, idx):
-        return self._img_set[idx]
+    @property
+    def n_frame(self):
+        return self._n_frame
+
+    @property 
+    def stage(self):
+        return self._stage
+
+    @property    
+    def keys(self):
+        return self._person_set.keys
+    

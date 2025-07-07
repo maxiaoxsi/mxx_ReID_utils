@@ -104,6 +104,4 @@ def annot_upper_vl(args):
         path_img=path_reid,
         type_prompts="upper_vl",
     )
-    if isinstance(text, list):
-        text = text[0]
     annot_temp.set_annot('upper_vl', text)

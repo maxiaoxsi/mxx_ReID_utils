@@ -20,13 +20,11 @@ class PersonSet(SetBase):
         self, 
         cache:Cache
     ):
-        list_person = cache.get_list_person()
-        for person_dict in tqdm(list_person):
-            id_person = person_dict['id_person']
+        for id_person, cache_person in enumerate(cache()):
             self._keys.append(id_person)
             person = Person(
                 id=id_person, 
-                cache_img=person_dict['list_img'],
+                cache_person=cache_person,
                 logger=self._logger,
                 dataset=self._dataset,
             )

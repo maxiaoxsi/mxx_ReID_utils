@@ -10,9 +10,9 @@ img_set: <list: <object.img>>, img for person
 video_set: <list: <object.video>>, video for person
 '''
 class Person:
-    def __init__(self, id, cache_img, dataset, logger) -> None:
+    def __init__(self, id, cache_person, dataset, logger) -> None:
         self._id = id
-        self._cache_img = cache_img
+        self._cache_person = cache_person
         self._img_set = None
         self._video_set = None
         self._dataset = dataset
@@ -21,7 +21,7 @@ class Person:
 
     def _load_cache(self):
         self._img_set = ImgSet()
-        for cache_img in self._cache_img:
+        for cache_img in self._cache_person:
             name_img = cache_img['name']
             img = Img(
                 cache=cache_img,
@@ -30,7 +30,7 @@ class Person:
                 logger=self._logger
             )
             self._img_set.add_item(name_img, img)
-        del self._cache_img
+        del self._cache_person
 
     def get_sample(self, idx_video_tgt, idx_img_tgt, n_frame, stage, is_select_bernl):
         """Get a sample from the person's imgSet or videoSet"""

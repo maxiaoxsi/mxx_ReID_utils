@@ -19,7 +19,7 @@ def annot_upper_vl_batch(path_cfg):
         name_proc="annot_upper_vl", 
         method=annot_upper_vl,  
         batch_size=128,
-        max_workers=4,
+        max_workers=8,
     )
 
 def render_skeleton_batch(path_cfg):
@@ -29,24 +29,25 @@ def render_skeleton_batch(path_cfg):
         name_proc="render_skeleton", 
         method=render_skeleton,  
         batch_size=128,
-        max_workers=4,
+        max_workers=8,
     )
 
 def annot_drn_smplx_batch(path_cfg):
     process_batch(
         path_cfg=path_cfg, 
         name_proc="annot_drn_smplx", 
-        method_proc_dir=None,
-        method_proc_file=annot_drn_smplx,    
+        method=annot_drn_smplx,   
+        batch_size=128,
+        max_workers=8, 
     )
 
-def rename_guidance_batch(path_cfg):
-    process_batch(
-        path_cfg=path_cfg, 
-        name_proc="rename_guidance", 
-        method_proc_dir=rename_guidance,
-        method_proc_file=None,     
-    )
+# def rename_guidance_batch(path_cfg):
+#     process_batch(
+#         path_cfg=path_cfg, 
+#         name_proc="rename_guidance", 
+#         method_proc_dir=rename_guidance,
+#         method_proc_file=None,     
+#     )
 
 def make_mask(path_cfg):
     from mxx.utils.batch import process_make_mask
@@ -64,7 +65,6 @@ if __name__ == '__main__':
     # render_skeleton(path_cfg)
     # make_mask(path_cfg)
     # annot_upper_vl_batch(path_cfg)
-    # render_skeleton_batch(path_cfg=path_cfg)
-    annot_upper_vl_batch(path_cfg)
+    render_skeleton_batch(path_cfg=path_cfg)
     
 
