@@ -11,24 +11,23 @@ video_set: <list: <object.video>>, video for person
 class Person:
     def __init__(self, id, cache_person, dataset, logger) -> None:
         self._id = id
-        self._cache_person = cache_person
+        self._cache = cache_person
         self._img_set = None
         self._dataset = dataset
         self._logger = logger
-        # self._load_cache()
 
     def _load_cache(self):
         self._img_set = ImgSet()
-        for cache_img in self._cache_person:
-            name_img = cache_img['name']
+        for basename, cache_img in self._cache.items():
             img = Img(
+                basename=basename,
                 cache=cache_img,
                 dataset=self._dataset,
                 person=self,
                 logger=self._logger
             )
-            self._img_set.add_item(name_img, img)
-        del self._cache_person
+            self._img_set.add_item(basename, img)
+        del self._cache
 
     def get_sample(self, idx_video_tgt, idx_img_tgt, n_frame, stage, is_select_bernl):
         """Get a sample from the person's imgSet or videoSet"""
@@ -57,8 +56,8 @@ class Person:
         from ..utils.data import get_annot_list, get_img_pil_list
         img_ref_pil_list = get_img_pil_list(img_ref_list, "reid")
         img_tgt_pil_list = get_img_pil_list(img_tgt_list, "reid")
-        img_manikin_pil_list = get_img_pil_list(img_tgt_list, "smplx_manikin")
-        img_skeleton_pil_list = get_img_pil_list(img_tgt_list, "smplx_skeleton")
+        img_manikin_pil_list = get_img_pil_list(img_tgt_list, "manikin")
+        img_skeleton_pil_list = get_img_pil_list(img_tgt_list, "skeleton")
         img_mask_pil_list = get_img_pil_list(img_tgt_list, "mask")
         img_foreground_pil_list = get_img_pil_list(img_tgt_list, "foreground")
         img_background_pil_list = get_img_pil_list(img_tgt_list, "background")

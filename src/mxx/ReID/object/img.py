@@ -7,26 +7,28 @@ import os
 import warnings
 import numpy as np
 from .annotation import Annotation
+from ..utils.path import get_path
+
 
 
 class Img:
     def __init__(
         self,
+        basename,
         cache,
         dataset, 
         person, 
         logger, 
     ) -> None:
-        
+        self._basename = basename
         self._dir_sub = cache["dir_sub"]
-        self._name = cache["name"]
-        self._suff = cache["suff"]
-        # self._is_smplx = cache["is_smplx"]
+        self._is_smplx = cache["is_smplx"]
         self._dataset = dataset
         self._person = person
         self._logger = logger
+        path_annot = get_path(self.dir, self.dir_sub, self.basename, self.ext, "annot")
         self._annot = Annotation(
-            path_annot=self.get_path('annot'), 
+            path_annot=path_annot, 
             img=self,
             logger=self._logger, 
         )
@@ -49,48 +51,49 @@ class Img:
             dir_insert = ''
         return os.path.join(dir_base, self._dir_sub, dir_insert)
 
-    def get_path(self, tgt):
-        dir_tgt = self.get_dir(tgt)
-        if tgt == 'annot':
-            suff = 'yaml'
-        elif tgt == 'smplx_pred':
-            suff = 'npz'
-        else:
-            suff = self._suff
-        name = f"{self._name}.{suff}"
-        return os.path.join(dir_tgt, name)
 
-    def get_name(self):
-        return self._name
 
-    def get_name_img(self):
-        return f"{self._name}.{self._suff}"
-
-    def get_img_pil(self, type):
+    def get_img_pil(self, key):
         """Return the image as a PIL Image object."""
-        if type in ['background', 'foreground']:
-            path_reid = self.get_path("reid")
-            path_mask = self.get_path("mask")
+        if key in ['background', 'foreground']:
+            path_reid = get_path(self.dir, self.dir_sub, self.basename, self.ext, "reid")
+            path_mask = get_path(self.dir, self.dir_sub, self.basename, self.ext, "mask")
             from ...utils.mask import make_back_and_fore_img
             img_fore, img_back = make_back_and_fore_img(
                 path_reid=path_reid, 
                 path_mask=path_mask
             )
-            if type == "background":
+            if key == "background":
                 return img_back
-            elif type == "foreground":
+            elif key == "foreground":
                 return img_fore
-        path = self.get_path(type)
-        if path is None:
-            return None
+
+        path = get_path(self.dir, self.dir_sub, self.basename, self.ext, key)
+        
         if not os.path.exists(path):
             return None
+        
         return Image.open(path)
 
     @property
     def score(self):
         return self._score 
 
+    @property
+    def dir(self):
+        return self._dataset.dir
+
+    @property
+    def dir_sub(self):
+        return self._dir_sub
+
+    @property
+    def basename(self):
+        return self._basename
+
+    @property
+    def ext(self):
+        return self._dataset.ext
 
     def calib_score(self, img_tgt):
         self._score = 0

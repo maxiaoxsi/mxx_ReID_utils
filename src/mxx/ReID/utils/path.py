@@ -11,12 +11,27 @@ def load_cfg(path_cfg, is_check=True):
         check_cfg_dir(cfg['dir']['mask'])
     return cfg
 
-def get_dir_base(dir_base, type_dir):
+def get_dir_sub(dir, dir_base):
+    dir_base = get_dir_base("reid", dir_base)
+    from ...utils.path import get_dir_sub
+    return get_dir_sub(dir, dir_base)
+
+def get_ext(key, ext):
+    if key == 'pred':
+        return 'npz'
+    elif key == 'annot':
+        return 'yaml'
+    else:
+        return ext
+
+def get_dir_base(key, dir_base):
     if isinstance(dir_base, dict):
         if "dir" in dir_base:
             dir_base = dir_base["dir"]
-        if type_dir in dir_base:
-            dir_base = dir_base[type_dir]
+        if key in ["skeleton", "pred", "manikin"]:
+            key = "smplx"
+        if key in dir_base:
+            dir_base = dir_base[key]
             return dir_base
         else:
             raise Exception("can't load cfg file")
@@ -25,25 +40,17 @@ def get_dir_base(dir_base, type_dir):
     else:
         raise Exception("can't get basename")
 
-def get_path_reid(dir_base, dir_sub, basename, ext):
-    dir_base = get_dir_base(dir_base, "reid")
-    return os.path.join(dir_base, dir_sub, f"{basename}.{ext}")
+def get_dir_ext(key):
+    if key in ["skeleton", "manikin", "pred"]:
+        return key
+    else:
+        return ""
 
-def get_path_annot(dir_base, dir_sub, basename):
-    dir_base = get_dir_base(dir_base, "annot")
-    return os.path.join(dir_base, dir_sub, f"{basename}.yaml")
-
-def get_path_manikin(dir_base, dir_sub, basename, ext):
-    dir_base = get_dir_base(dir_base, "smplx")
-    return os.path.join(dir_base, dir_sub, 'manikin', f"{basename}.{ext}") 
-
-def get_path_pred(dir_base, dir_sub, basename):
-    dir_base = get_dir_base(dir_base, "smplx")
-    return os.path.join(dir_base, dir_sub, "pred", f"{basename}.npz")
-
-def get_path_skeleton(dir_base, dir_sub, basename, ext):
-    dir_base = get_dir_base(dir_base, "smplx")
-    return os.path.join(dir_base, dir_sub, "skeleton", f"{basename}.{ext}")
+def get_path(dir_base, dir_sub, basename, ext, key):
+    dir_base = get_dir_base(key, dir_base)
+    dir_ext = get_dir_ext(key)
+    ext = get_ext(key, ext)
+    return os.path.join(dir_base, dir_sub, dir_ext, f"{basename}.{ext}")
 
 def load_name(file):
     name_file = file.split('/')[-1]
@@ -51,7 +58,3 @@ def load_name(file):
     name_file = name_file.split('.')[0]
     return name_file, suff_file
 
-def get_dir_sub(dir, dir_base):
-    dir_base = get_dir_base(dir_base, "reid")
-    from ...utils.path import get_dir_sub
-    return get_dir_sub(dir, dir_base)

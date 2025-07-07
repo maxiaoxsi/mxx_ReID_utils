@@ -35,7 +35,7 @@ class Annotation(AnnotBase):
             annot = self._annot[idx_vl]
         else:
             annot = "key error!"
-            self._logger.warning(f"annotation: {self._img.get_name()} search key:{idx} not exists in yaml file!")
+            self._logger.warning(f"annotation: {self._img.basename} search key:{idx} not exists in yaml file!")
         if idx in self._key_str_list:
             return annot
         elif idx in self._key_bool_list:
@@ -43,7 +43,7 @@ class Annotation(AnnotBase):
                 return True
             if annot in ['no', 'False', 'no.']:
                 return False
-            name_reid = self._img.get_name()
+            name_reid = self._img.basename
             self._logger.warning(f"{name_reid} __getitem__ bool key get other annot:{idx}, {annot}")
             return True
 

@@ -394,3 +394,7 @@ class ReIDDataset(Dataset):
     @property
     def type(self):
         return self._type
+
+    @property
+    def dir(self):
+        return self._dir

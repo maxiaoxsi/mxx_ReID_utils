@@ -9,6 +9,12 @@ def save_samples(dataset, idx):
     print(idx_selected)
     for i in idx_selected:
         sample = dataset[i]
+        save_sample(
+            sample=sample, 
+            dir_base=os.path.join('./test', f"img_{i}"),
+            is_norm=True,
+        )
+        print(f'img_{i} sample saved')
 
 
 
@@ -35,12 +41,4 @@ if __name__ == '__main__':
     else:
         idx_selected = range(args.n_person)
     save_samples(dataset=dataset, idx=idx_selected)
-    exit()
-    for i in idx_selected:
-        sample = dataset_market[i]
-        save_sample(
-            sample=sample, 
-            dir_base=os.path.join('./test', f"img_{i}"),
-            is_norm=True,
-        )
-        print(f'img_{i} sample saved')
+        

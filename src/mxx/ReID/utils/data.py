@@ -142,9 +142,9 @@ def get_annot_list(img_list):
         annot_list.append(annot)
     return annot_list
 
-def get_img_pil_list(img_list, type_img):
+def get_img_pil_list(img_list, key):
     return [
-        img.get_img_pil(type_img) 
+        img.get_img_pil(key) 
         if img is not None 
         else None
         for img in img_list 

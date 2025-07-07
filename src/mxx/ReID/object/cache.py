@@ -1,7 +1,7 @@
 import os
 import pickle
 
-from mxx.ReID.utils.path import get_path_manikin
+from mxx.ReID.utils.path import get_path
 from ..utils import get_utils
 from ...utils.path import get_ext
 from ...ReID.utils.path import get_dir_sub
@@ -29,7 +29,7 @@ def add_person_vid(person_dict, id_person, dir_sub, id_vid, id_frame, is_smplx):
     add_vid(person, dir_sub, id_vid, id_frame, is_smplx)
 
 def add_person_img(person_dict, id_person, dir_sub, basename, is_smplx):
-    if id_person not in person_dict:
+    if id_person in person_dict:
         person = person_dict[id_person]
     else:
         person = {}
@@ -37,7 +37,6 @@ def add_person_img(person_dict, id_person, dir_sub, basename, is_smplx):
     
     person[basename] = {
         'dir_sub':dir_sub,
-        'name':basename,
         'is_smplx':is_smplx,
     }
 
@@ -94,11 +93,11 @@ class Cache:
                     continue
                 id_vid = parser.load_id_video(basename)
                 id_frame = parser.load_id_frame(basename) 
-                path_manikin = get_path_manikin(self._dir, dir_sub, basename, ext)
+                path_manikin = get_path(self._dir, dir_sub, basename, ext, "manikin")
                 is_smplx = os.path.exists(path_manikin)
                 add_person_vid(person_dict, id_person, dir_sub, id_vid, id_frame, is_smplx)
         self._cache['type'] = 'vid'
-        self._cache['ext'] = 'ext'
+        self._cache['ext'] = ext
         self._cache['person'] = person_dict 
 
     def _create_cache_img(self, parser):
@@ -109,15 +108,15 @@ class Cache:
             for file in files:
                 if not file.endswith(('.jpg', '.png')):
                     continue
+                basename, ext = get_ext(file=file)
                 id_person = parser.load_id_person(basename, dir_sub)
                 if not id_person.isdigit() or int(id_person) < id_person_min:
                     continue
-                basename, ext = get_ext(file=file)
-                path_manikin = get_path_manikin(self._dir['smplx'], dir_sub, file)
+                path_manikin = get_path(self._dir, dir_sub, basename, ext, "manikin")
                 is_smplx = os.path.exists(path_manikin)
                 add_person_img(person_dict, id_person, dir_sub, basename, is_smplx)
-        self._cache['type'] = 'vid'
-        self._cache['ext'] = 'ext'
+        self._cache['type'] = 'img'
+        self._cache['ext'] = ext
         self._cache['person'] = person_dict 
 
     @property

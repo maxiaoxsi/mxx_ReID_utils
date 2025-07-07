@@ -22,8 +22,8 @@ class PersonSet(SetBase):
                 person = Person(
                     id=id_person, 
                     cache_person=cache_person,
-                    logger=self._logger,
                     dataset=self._dataset,
+                    logger=self._logger,
                 )
             elif self._dataset.type == "vid":
                 person = PersonVid(
