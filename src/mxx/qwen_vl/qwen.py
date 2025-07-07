@@ -60,26 +60,38 @@ please anwser with a brief phrase 'yes' or 'no'"
 
     return prompts
 
-def get_qwen_annot(messages):
-    text = processor_qwen.apply_chat_template(
-        messages, tokenize=False, add_generation_prompt=True
-    )
-    from qwen_vl_utils import process_vision_info
-    image_inputs, video_inputs = process_vision_info(messages)
+def get_qwen_annot(messages_list):
+    texts_batch = []
+    images_batch = []
+    videos_batch = []
+    for messages in messages_list:
+        text = processor_qwen.apply_chat_template(
+            messages, tokenize=False, add_generation_prompt=True
+        )
+        from qwen_vl_utils import process_vision_info
+        image_inputs, video_inputs = process_vision_info(messages)
+        texts_batch.append(text)
+        images_batch.append(image_inputs)
+        videos_batch.append(video_inputs)
     inputs = processor_qwen(
-        text=[text],
-        images=image_inputs,
-        videos=video_inputs,
+        text=texts_batch,
+        images=images_batch if any(images_batch) else None,
+        videos=videos_batch if any(videos_batch) else None,
         padding=True,
         return_tensors="pt",
     )
     inputs = inputs.to(model_qwen.device)
-    generated_ids = model_qwen.generate(**inputs, max_new_tokens=128)
+    generated_ids = model_qwen.generate(
+        **inputs, 
+        max_new_tokens=128,
+    )
     generated_ids_trimmed = [
         out_ids[len(in_ids) :] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)
     ]
     output_text = processor_qwen.batch_decode(
-        generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False
+        generated_ids_trimmed, 
+        skip_special_tokens=True, 
+        clean_up_tokenization_spaces=False
     )
     return output_text
 
@@ -109,24 +121,27 @@ def get_messages(path_img_list, prompt_list):
         ]
         return messages
 
-def get_annot_img(path_img, prompt):
-    messages = get_messages(
-        path_img_list=[path_img],
-        prompt_list=[prompt]
-    )
+def get_annot_img(path_img_list, prompt):
+    messages_list = []
+    for path_img in path_img_list:
+        messages = get_messages(
+            path_img_list=[path_img],
+            prompt_list=[prompt]
+        )
+        messages_list.append(messages)
     text_output = get_qwen_annot(
-        messages=messages
+        messages_list=messages_list
     )
     return text_output
 
-def get_annot_batch(path_img, type_prompts):
+def get_annot_batch(path_img_list, idx_annot):
     global model_qwen, processor_qwen
     if model_qwen is None:
         model_qwen, processor_qwen = load_qwen()
     prompts = init_prompts()
-    prompt = prompts[type_prompts]
+    prompt = prompts[idx_annot]
     text_output = get_annot_img(
-        path_img=path_img, 
+        path_img_list=path_img_list, 
         prompt=prompt,
     )
     return text_output

@@ -14,8 +14,9 @@ import torchvision.transforms as transforms
 import torchvision.transforms.functional as F
 import pickle
 
-from .set import PersonSet, ImgSet, VidPersonSet
-from .object import Person, Img
+from .set.person_set import PersonSet
+from .object.person import Person
+from .object.img import Img
 from .object.cache import Cache
 from ..log.logger import Logger
 from .utils.path import load_cfg
@@ -35,9 +36,6 @@ class ReIDDataset(Dataset):
         img_size=(512, 512),
         stage = 1,
         n_frame = 10,
-        is_divide = False,
-        st_divide = 0,
-        ed_divide = -1,
     ) -> None:
         self._img_size=img_size
         self._stage=stage
@@ -47,8 +45,9 @@ class ReIDDataset(Dataset):
         self._rate_dropout_back = rate_dropout_back
         self._rate_dropout_smplx = rate_dropout_smplx
         self._logger = Logger(path_log=path_log)
-
+        
         cfg = load_cfg(path_cfg)
+
         self._dir = cfg['dir']
         self._id = cfg["id_dataset"]
 
@@ -56,11 +55,17 @@ class ReIDDataset(Dataset):
             cfg=cfg,
             logger=self._logger
         )
-        if cache.type == 'img':
-            self._person_set = PersonSet(dataset=self, logger=self._logger)
-        elif cache.type == 'vid':
-            self._person_set = VidPersonSet
-        self._person_set.load_cache(cache)
+        self._ext = cache.ext
+        self._type = cache.type
+
+        self._person_set = PersonSet(
+            dataset=self, 
+            logger=self._logger,
+        )
+
+        self._person_set.load_cache(
+            cache=cache,
+        )
 
         print(f"load cache from dataset:{self._id}")
         
@@ -382,3 +387,10 @@ class ReIDDataset(Dataset):
     def keys(self):
         return self._person_set.keys
     
+    @property
+    def ext(self):
+        return self._ext
+    
+    @property
+    def type(self):
+        return self._type

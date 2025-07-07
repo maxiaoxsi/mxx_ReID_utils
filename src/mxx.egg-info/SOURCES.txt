@@ -13,6 +13,7 @@ src/mxx/ReID/object/annotation.py
 src/mxx/ReID/object/cache.py
 src/mxx/ReID/object/img.py
 src/mxx/ReID/object/person.py
+src/mxx/ReID/object/person_vid.py
 src/mxx/ReID/object/video.py
 src/mxx/ReID/set/__init__.py
 src/mxx/ReID/set/img_set.py
@@ -21,6 +22,7 @@ src/mxx/ReID/set/set_base.py
 src/mxx/ReID/set/video_set.py
 src/mxx/ReID/utils/__init__.py
 src/mxx/ReID/utils/data.py
+src/mxx/ReID/utils/path.py
 src/mxx/ReID/utils/text.py
 src/mxx/ReID/utils/util.py
 src/mxx/ReID/viewer/__init__.py
@@ -29,4 +31,5 @@ src/mxx/utils/__init__.py
 src/mxx/utils/batch.py
 src/mxx/utils/list.py
 src/mxx/utils/mask.py
+src/mxx/utils/path.py
 src/mxx/utils/sample.py

@@ -3,7 +3,7 @@ from ..object.video import Video
 
 import random
 
-class VideoSet(SetBase):
+class VidSet(SetBase):
     def __init__(self) -> None:
         super().__init__()
 

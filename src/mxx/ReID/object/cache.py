@@ -3,39 +3,41 @@ import pickle
 
 from mxx.ReID.utils.path import get_path_manikin
 from ..utils import get_utils
-from ...utils.batch import load_name
+from ...utils.path import get_ext
+from ...ReID.utils.path import get_dir_sub
 
 def add_vid(person, dir_sub, id_vid, id_frame, is_smplx):
     if id_vid not in person:
         person[id_vid] = {
             'dir_sub': dir_sub,
-            'frame': int(id_frame),
-            'not_smplx': [],
+            'n_frame': int(id_frame),
+            'frame_without_smplx': [],
         }
     video = person[id_vid]
-    if int(id_frame) > person['frame']:
-        person['frame'] = int(id_frame)
+    if int(id_frame) > video['n_frame']:
+        video['n_frame'] = int(id_frame)
     if not is_smplx:
-        video['not_smplx'].append(int(id_frame))
+        video['frame_without_smplx'].append(int(id_frame))
 
 
 def add_person_vid(person_dict, id_person, dir_sub, id_vid, id_frame, is_smplx):
-    if id_person not in person_dict:
-        person_dict[id_person] = {}
-    person = person_dict[id_person]
-    add_vid(person, dir_sub, id_vid, id_frame, is_smplx)
-
-def add_person_img(person_dict, id_person, dir_sub, 
-        name, suff, is_smplx):
     if id_person in person_dict:
         person = person_dict[id_person]
     else:
         person = {}
         person_dict[id_person] = person
-    person[name] = {
+    add_vid(person, dir_sub, id_vid, id_frame, is_smplx)
+
+def add_person_img(person_dict, id_person, dir_sub, basename, is_smplx):
+    if id_person not in person_dict:
+        person = person_dict[id_person]
+    else:
+        person = {}
+        person_dict[id_person] = person
+    
+    person[basename] = {
         'dir_sub':dir_sub,
-        'name':name,
-        'suff':suff,
+        'name':basename,
         'is_smplx':is_smplx,
     }
 
@@ -45,23 +47,22 @@ class Cache:
         cfg, 
         logger,
         is_save=True, 
-        is_divide=False, 
     ):
         self._logger = logger
         self._id_dataset = cfg["id_dataset"]
         self._dir = cfg['dir']
-        self._path_cache = cfg["path_cache"]
+        path_cache = cfg["path_cache"]
         self._cache = {}
 
-        if self._path_cache is None or not os.path.exists(self._path_cache):
+        if path_cache is None or not os.path.exists(path_cache):
             self._create_cache()
-            if self._path_cache is not None and is_save:
-                dir_cache = os.path.dirname(self._path_cache)
+            if path_cache is not None and is_save:
+                dir_cache = os.path.dirname(path_cache)
                 os.makedirs(dir_cache, exist_ok=True)
-                with open(self._path_cache, 'wb') as f:
+                with open(path_cache, 'wb') as f:
                     pickle.dump(self._cache, f)
         else:
-            self._load_cache(self._path_cache) 
+            self._load_cache(path_cache) 
             
 
     def _load_cache(self, path_cache):
@@ -83,44 +84,49 @@ class Cache:
         person_dict = {}
         id_person_min = parser.get_id_person_min()
         for root, dirs, files in os.walk(self._dir["reid"]):
-            dir_sub = root[len(self._dir["reid"]) + 1:]
+            dir_sub = get_dir_sub(root, self._dir)
             for file in files:
                 if not file.endswith(('.jpg', '.png')):
                     continue
-                name_file, suff_file = load_name(file=file)
-                id_person = parser.load_id_person(name_file, dir_sub)
+                basename, ext = get_ext(file=file)
+                id_person = parser.load_id_person(basename, dir_sub)
                 if not id_person.isdigit() or int(id_person) < id_person_min:
                     continue
-                id_vid = parser.load_id_video(name_file)
-                id_frame = parser.load_id_frame(name_file) 
-                from ..utils.path import get_path_manikin
-                is_smplx = os.path.exists(get_path_manikin(dir, dir_sub, file))
+                id_vid = parser.load_id_video(basename)
+                id_frame = parser.load_id_frame(basename) 
+                path_manikin = get_path_manikin(self._dir, dir_sub, basename, ext)
+                is_smplx = os.path.exists(path_manikin)
                 add_person_vid(person_dict, id_person, dir_sub, id_vid, id_frame, is_smplx)
-                self._cache['type'] = 'vid'
-                self._cache['person'] = person_dict 
+        self._cache['type'] = 'vid'
+        self._cache['ext'] = 'ext'
+        self._cache['person'] = person_dict 
 
     def _create_cache_img(self, parser):
         person_dict = {}
         id_person_min = parser.get_id_person_min()
         for root, dirs, files in os.walk(self._dir["reid"]):
-            dir_sub = root[len(self._dir["reid"]) + 1:]
+            dir_sub = get_dir_sub(root, self._dir)
             for file in files:
                 if not file.endswith(('.jpg', '.png')):
                     continue
-                id_person = parser.load_id_person(name_file, dir_sub)
+                id_person = parser.load_id_person(basename, dir_sub)
                 if not id_person.isdigit() or int(id_person) < id_person_min:
                     continue
- 
-                name_file, suff_file = load_name(file=file)
+                basename, ext = get_ext(file=file)
                 path_manikin = get_path_manikin(self._dir['smplx'], dir_sub, file)
                 is_smplx = os.path.exists(path_manikin)
-
-                add_person_img(person_dict, id_person, dir_sub, name_file, suff_file, is_smplx)
-        self._cache['person'] = person_dict
+                add_person_img(person_dict, id_person, dir_sub, basename, is_smplx)
+        self._cache['type'] = 'vid'
+        self._cache['ext'] = 'ext'
+        self._cache['person'] = person_dict 
 
     @property
     def type(self):
         return self._cache['type']
+
+    @property
+    def ext(self):
+        return self._cache['ext']
 
     def __call__(self):
         return self._cache['person']

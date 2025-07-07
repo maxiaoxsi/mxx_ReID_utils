@@ -1,7 +1,7 @@
 import random
 # import torch
 from .set_base import SetBase
-from ..object import Img
+from ..object.img import Img
 from ..utils.annot.score import add_img_by_score
 from tqdm import tqdm
 

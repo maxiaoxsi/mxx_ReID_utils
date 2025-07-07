@@ -1,5 +1,5 @@
-from mxx.utils.batch import process_batch
-from mxx.utils.batch import rename_guidance
+from mxx.utils.batch import process_batch, process_batch_vl
+# from mxx.utils.batch import rename_guidance
 
 # from mxx.utils.batch import annot_drn_smplx, annot_is_backpack
 
@@ -12,18 +12,8 @@ from mxx.utils.batch import rename_guidance
 #         method_proc_file=annot_is_smplx,    
 #     )
 
-def annot_upper_vl_batch(path_cfg):
-    from mxx.annot.utils.batch import annot_upper_vl
-    process_batch(
-        path_cfg=path_cfg, 
-        name_proc="annot_upper_vl", 
-        method=annot_upper_vl,  
-        batch_size=128,
-        max_workers=8,
-    )
-
 def render_skeleton_batch(path_cfg):
-    from mxx.smplx.utils.batch import render_skeleton
+    from mxx.smplx.utils.render import render_skeleton
     process_batch(
         path_cfg=path_cfg, 
         name_proc="render_skeleton", 
@@ -53,6 +43,15 @@ def make_mask(path_cfg):
     from mxx.utils.batch import process_make_mask
     process_make_mask(path_cfg)
 
+def annot_upper_vl_batch(path_cfg):
+    from mxx.annot.utils.annot_vl import annot_upper_vl
+    process_batch_vl(
+        path_cfg=path_cfg,
+        name_batch="annot_upper_vl", 
+        method_batch=annot_upper_vl,  
+        batch_size=64,
+    )
+
 if __name__ == '__main__':
     # path_cfg = '/machangxiao/code/MIP-ReID/configs/datasets/Market-1501-v15.09.15/cfg_cache_market_train.yaml'
     # path_cfg = '/machangxiao/code/MIP-ReID/configs/datasets/MSMT17/cfg_cache_msmt17_train.yaml'
@@ -64,7 +63,7 @@ if __name__ == '__main__':
     # annot_is_backpack_batch(path_cfg)
     # render_skeleton(path_cfg)
     # make_mask(path_cfg)
-    # annot_upper_vl_batch(path_cfg)
-    render_skeleton_batch(path_cfg=path_cfg)
+    annot_upper_vl_batch(path_cfg=path_cfg)
+    # render_skeleton_batch(path_cfg=path_cfg)
     
 

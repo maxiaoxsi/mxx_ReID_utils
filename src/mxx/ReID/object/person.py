@@ -1,6 +1,5 @@
 from .img import Img
 from ..set.img_set import ImgSet
-from ..set.video_set import VideoSet
 import random
 
 '''
@@ -14,7 +13,6 @@ class Person:
         self._id = id
         self._cache_person = cache_person
         self._img_set = None
-        self._video_set = None
         self._dataset = dataset
         self._logger = logger
         # self._load_cache()

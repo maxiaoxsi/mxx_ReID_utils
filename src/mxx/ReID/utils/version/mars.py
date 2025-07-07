@@ -4,7 +4,7 @@ def load_id_person(name_person, sub_dir):
 def load_id_video(name_person):
     return name_person[4:11]
 
-def load_idx_frame(name_person):
+def load_id_frame(name_person):
     return name_person[12:15]
 
 def get_id_person_min():
