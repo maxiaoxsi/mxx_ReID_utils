@@ -33,15 +33,15 @@ such as  'white t-shirt'. \
 A brief phrase is enough, no full sentences."
 
     prompts["color_upper_vl"] = "Could you please describe \
-the color of the upper clothing from the text? \
+the color of the upper clothing from the text phrase upper_vl? \
 Answer with a brief phrase 'color' from phrase 'color' + 'style' \
-such as answer 'white' when the text is 'white t-shirt'. \
+such as answer 'white' when the text is 'upper_vl:white t-shirt'. \
 A brief phrase is enough, no full sentences."
 
     prompts["color_bottoms_vl"] = "Could you please describe \
-the color of the bottoms from the text?\
+the color of the bottoms from the text phrase bottoms_vl?\
 Answer with a brief phrase 'color' from phrase 'color' + 'style'\
-such as answer 'red' when the text is 'red shorts'. \
+such as answer 'red' when the text is 'bottoms_vl:red shorts'. \
 A brief phrase is enough, no full sentences."
 
     prompts["is_shoulder_bag_vl"] = "Could you please describe \
@@ -78,6 +78,7 @@ def get_qwen_annot(messages_list):
         images=images_batch if any(images_batch) else None,
         videos=videos_batch if any(videos_batch) else None,
         padding=True,
+        padding_side='left',
         return_tensors="pt",
     )
     inputs = inputs.to(model_qwen.device)
@@ -95,7 +96,7 @@ def get_qwen_annot(messages_list):
     )
     return output_text
 
-def get_messages(path_img_list, prompt_list):
+def get_messages(path_img_list, text_annot_list, prompt_list):
         content_list = []
         if path_img_list is not None:
             for path_img in path_img_list:
@@ -103,6 +104,14 @@ def get_messages(path_img_list, prompt_list):
                     {
                         "type": "image",
                         "image": path_img,
+                    }
+                )
+        if text_annot_list is not None:
+            for text_annot in text_annot_list:
+                content_list.append(
+                    {
+                        "type":"text",
+                        "text":text_annot,
                     }
                 )
         for prompt in prompt_list:
@@ -121,11 +130,12 @@ def get_messages(path_img_list, prompt_list):
         ]
         return messages
 
-def get_annot_img(path_img_list, prompt):
+def get_annot_img(path_img_list, texts_annot_list, prompt):
     messages_list = []
-    for path_img in path_img_list:
+    for path_img, texts_annot in zip(path_img_list, texts_annot_list):
         messages = get_messages(
             path_img_list=[path_img],
+            text_annot_list = texts_annot,
             prompt_list=[prompt]
         )
         messages_list.append(messages)
@@ -134,7 +144,7 @@ def get_annot_img(path_img_list, prompt):
     )
     return text_output
 
-def get_annot_batch(path_img_list, idx_annot):
+def get_annot_batch(path_img_list, texts_annot_list, idx_annot):
     global model_qwen, processor_qwen
     if model_qwen is None:
         model_qwen, processor_qwen = load_qwen()
@@ -142,30 +152,7 @@ def get_annot_batch(path_img_list, idx_annot):
     prompt = prompts[idx_annot]
     text_output = get_annot_img(
         path_img_list=path_img_list, 
-        prompt=prompt,
-    )
-    return text_output
-
-def get_is_backpack(path_img):
-    global model_qwen, processor_qwen
-    if model_qwen is None:
-        model_qwen, processor_qwen = load_qwen()
-    prompts = init_prompts()
-    prompt = prompts['is_backpack_vl']
-    text_output = get_annot_img(
-        path_img=path_img, 
-        prompt=prompt,
-    )
-    return text_output
-
-def get_is_backpack(path_img):
-    global model_qwen, processor_qwen
-    if model_qwen is None:
-        model_qwen, processor_qwen = load_qwen()
-    prompts = init_prompts()
-    prompt = prompts['is_backpack_vl']
-    text_output = get_annot_img(
-        path_img=path_img, 
+        texts_annot_list=texts_annot_list,
         prompt=prompt,
     )
     return text_output

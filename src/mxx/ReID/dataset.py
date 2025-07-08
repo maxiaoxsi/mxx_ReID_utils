@@ -53,7 +53,8 @@ class ReIDDataset(Dataset):
 
         cache = Cache(
             cfg=cfg,
-            logger=self._logger
+            logger=self._logger,
+            is_save=is_save,
         )
         self._ext = cache.ext
         self._type = cache.type
@@ -61,9 +62,6 @@ class ReIDDataset(Dataset):
         self._person_set = PersonSet(
             dataset=self, 
             logger=self._logger,
-        )
-
-        self._person_set.load_cache(
             cache=cache,
         )
 
@@ -78,8 +76,8 @@ class ReIDDataset(Dataset):
     def __getitem__(self, idx):
         return self.get_item(
             id_person=idx,
-            idx_img_tgt=-1,
-            idx_video_tgt=-1,
+            idx_vid=-1,
+            idx_img=-1,
         )
 
     def load_img_from_dir(self, dir_person, type_transforms, img_size, type_img = None):
@@ -170,16 +168,16 @@ class ReIDDataset(Dataset):
             samples[dir_person] = sample
         return samples   
 
-    def get_item(self, id_person, idx_img_tgt, idx_video_tgt):
+    def get_item(self, id_person, idx_vid, idx_img):
         person = self._person_set[id_person]
         if not isinstance(person, Person):
             return None
         sample = person.get_sample(
-            idx_img_tgt=idx_img_tgt,
-            idx_video_tgt=idx_video_tgt,
-            n_frame=self._n_frame,
-            stage=self._stage,
-            is_select_bernl=self._is_select_bernl
+            idx_vid=idx_vid,
+            idx_img=idx_img,
+            n_frame=self.n_frame,
+            stage=self.stage,
+            is_select_bernl = self.is_select_bernl,
         )
         seed = int(time.time())
         img_ref_tensor_list = self.get_img_tensor_list(
@@ -227,12 +225,12 @@ class ReIDDataset(Dataset):
             rate=self._rate_dropout_ref,
             args_img=(img_ref_tensor_list, img_reid_tensor_list)
         )
-        img_tgt_tensor = self._get_img_tensor(None, img_tgt_tensor_list)
-        img_manikin_tensor = self._get_img_tensor(None, img_manikin_tensor_list)
-        img_skeleton_tensor = self._get_img_tensor(None, img_skeleton_tensor_list)
-        img_background_tensor = self._get_img_tensor(
+        (img_tgt_tensor, ) = self._get_img_tensor(None, (img_tgt_tensor_list, ))
+        (img_manikin_tensor, ) = self._get_img_tensor(None, (img_manikin_tensor_list, ))
+        (img_skeleton_tensor, ) = self._get_img_tensor(None, (img_skeleton_tensor_list, ))
+        (img_background_tensor, ) = self._get_img_tensor(
             rate=self._rate_dropout_back,
-            args_img=img_background_tensor_list,
+            args_img=(img_background_tensor_list, ),
         )
 
         return  {
@@ -251,7 +249,7 @@ class ReIDDataset(Dataset):
             if rate is not None and random.random() < rate:
                 for img_tensor_list in args_img:
                     img_tensor_list[i] = torch.zeros_like(img_tensor_list[i])
-        return (torch.stack(item, dim=0) for item in args_img)
+        return tuple(torch.stack(item, dim=0) for item in args_img)
 
     def get_img_tensor_list(self, img_pil_list, type_transforms, img_size, seed = None):
         if type_transforms in ["ref", "tgt", "background", "manikin", "skeleton"]:
@@ -363,15 +361,6 @@ class ReIDDataset(Dataset):
             ]
         )
 
-    def get_dir(self, type_tgt):
-        if type_tgt in self._dir:
-            return self._dir[type_tgt]
-        type_tgt_sub = type_tgt.split('_')[0]
-        if type_tgt_sub in self._dir:
-            return self._dir[type_tgt_sub]
-        print(type_tgt)
-        raise Exception(f"dataset:unkown dir type:{type_tgt}")
-
     def get_person(self, id_person):
         return self._person_set[id_person]
 
@@ -398,3 +387,7 @@ class ReIDDataset(Dataset):
     @property
     def dir(self):
         return self._dir
+    
+    @property
+    def is_select_bernl(self):
+        return self._is_select_bernl

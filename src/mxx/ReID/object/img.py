@@ -43,16 +43,6 @@ class Img:
     def __contains__(self, idx):
         return idx in self._annot
 
-    def get_dir(self, tgt):
-        dir_base = self._dataset.get_dir(tgt)
-        if '_' in tgt:
-            dir_insert = tgt.split('_')[-1]
-        else:
-            dir_insert = ''
-        return os.path.join(dir_base, self._dir_sub, dir_insert)
-
-
-
     def get_img_pil(self, key):
         """Return the image as a PIL Image object."""
         if key in ['background', 'foreground']:
@@ -69,9 +59,8 @@ class Img:
                 return img_fore
 
         path = get_path(self.dir, self.dir_sub, self.basename, self.ext, key)
-        
         if not os.path.exists(path):
-            return None
+            raise Exception("path not exists")
         
         return Image.open(path)
 
@@ -95,7 +84,7 @@ class Img:
     def ext(self):
         return self._dataset.ext
 
-    def calib_score(self, img_tgt):
+    def calib_score(self, annot_tgt):
         self._score = 0
         for item in [
             'is_riding', 
@@ -104,30 +93,9 @@ class Img:
             'color_upper', 
             'color_bottoms',
         ]:
-            if self[item] == img_tgt[item]:
+            if self[item] == annot_tgt[item]:
                 self._score += 1
     
-    
-    
-    # def rename_key(self, **kwargs):
-    #     key = kwargs['key']
-    #     key_new = kwargs['key_new']
-    #     self._annot.rename_key(key, key_new)
-
-    # def remove_key(self, key):
-    #     self._annot.remove_key(key)
-
-    # def overwrite_key(self, **kwargs):
-    #     key = kwargs['key']
-    #     data_check = kwargs['data_check']
-    #     data_new = kwargs['data_new']
-    #     self._annot.overwrite_key(key, data_check, data_new)
-
-    # def write_key(self, **kwargs):
-    #     key = kwargs['key']
-    #     data = kwargs['data']
-    #     self._annot.write_annot(key, data)
-
     def get_text_tgt(self):
         text_ref = self.get_text_ref()
         text_ref = text_ref[:len(text_ref) - 1]
@@ -145,3 +113,26 @@ class Img:
         text = f'a photo of a people wearing {annot_upper} and {annot_bottoms}.'
         # a photo of a people wearing red t-shirt and dark shorts, with a backpack,
         return text
+    
+
+
+
+
+# def rename_key(self, **kwargs):
+    #     key = kwargs['key']
+    #     key_new = kwargs['key_new']
+    #     self._annot.rename_key(key, key_new)
+
+    # def remove_key(self, key):
+    #     self._annot.remove_key(key)
+
+    # def overwrite_key(self, **kwargs):
+    #     key = kwargs['key']
+    #     data_check = kwargs['data_check']
+    #     data_new = kwargs['data_new']
+    #     self._annot.overwrite_key(key, data_check, data_new)
+
+    # def write_key(self, **kwargs):
+    #     key = kwargs['key']
+    #     data = kwargs['data']
+    #     self._annot.write_annot(key, data)

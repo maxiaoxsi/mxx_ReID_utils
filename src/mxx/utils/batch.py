@@ -44,6 +44,7 @@ def process_batch(
 
 def process_batch_vl(
     path_cfg, 
+    keys_text,
     name_batch, 
     method_batch,
     idx_annot,
@@ -57,13 +58,13 @@ def process_batch_vl(
     with tqdm(total=n_files, desc=f"Processing {name_batch}") as pbar:
         for root, dirs, files in os.walk(dir_reid):
             for file in files:
-                data_list.append((cfg, root, file, logger))
+                data_list.append((root, file))
                 if len(data_list) == batch_size:
-                    method_batch(data_list, idx_annot)
+                    method_batch(idx_annot, data_list, keys_text, cfg, logger)
                     pbar.update(batch_size)
                     data_list = []
         if len(data_list) != 0:
-            method_batch(data_list, idx_annot)
+            method_batch(idx_annot, data_list, keys_text, cfg, logger)
             pbar.update(len(data_list))
         
 
@@ -107,43 +108,4 @@ def process_batch_vl(
 #         print("kkkkkk")
 #     return
         
-# def process_make_mask(path_cfg):
-#     cfg = load_cfg(path_cfg)
-#     dir_reid = cfg["dir"]["reid"]
-#     n_files = count_files(dir_reid)
-#     data_list = []
-#     from .mask import make_mask_img
-#     with tqdm(total=n_files, desc="Processing make mask") as pbar:
-#         for root, dirs, files in os.walk(dir_reid):
-#             for dir in dirs:
-#                 pbar.update(1)
-#             for file in files:
-#                 if not file.endswith(('.jpg', '.png')):
-#                     pbar.update(1)
-#                     continue
-#                 dir_reid = cfg["dir"]["reid"]
-#                 dir_smplx = cfg["dir"]["smplx"]
-#                 dir_mask = cfg["dir"]["mask"]
-#                 dir_sub = root[len(dir_reid) + 1:]
-#                 name_file = file.split('/')[-1]
-#                 suff_file = name_file.split('.')[-1]
-#                 name_file = name_file.split('.')[0]
-#                 path_reid = os.path.join(root, file)
-#                 path_mask = os.path.join(dir_mask, dir_sub, file)
-#                 path_manikin = os.path.join(dir_smplx,
-#                     dir_sub, 'manikin', file)
-#                 if not os.path.exists(path_manikin):
-#                     pbar.update(1)
-#                     continue
-#                 if os.path.exists(path_mask):
-#                     pbar.update(1)
-#                     continue
-#                 data_list.append((path_manikin, path_mask))
-#                 if len(data_list) == 128:
-#                     with ProcessPoolExecutor(max_workers=8) as executor:
-#                         list(executor.map(make_mask_img, data_list))
-#                     data_list = []
-#                     pbar.update(128)
-#         with ProcessPoolExecutor(max_workers=8) as executor:
-#             list(executor.map(make_mask_img, data_list))
-#             pbar.update(len(data_list))  
+ 

@@ -11,11 +11,6 @@ def load_cfg(path_cfg, is_check=True):
         check_cfg_dir(cfg['dir']['mask'])
     return cfg
 
-def get_dir_sub(dir, dir_base):
-    dir_base = get_dir_base("reid", dir_base)
-    from ...utils.path import get_dir_sub
-    return get_dir_sub(dir, dir_base)
-
 def get_ext(key, ext):
     if key == 'pred':
         return 'npz'
@@ -52,9 +47,13 @@ def get_path(dir_base, dir_sub, basename, ext, key):
     ext = get_ext(key, ext)
     return os.path.join(dir_base, dir_sub, dir_ext, f"{basename}.{ext}")
 
-def load_name(file):
-    name_file = file.split('/')[-1]
-    suff_file = name_file.split('.')[-1]
-    name_file = name_file.split('.')[0]
-    return name_file, suff_file
+def get_basename(name_file):
+    basename = name_file.split('.')[0]
+    ext = name_file.split('.')[-1]
+    return basename, ext
+
+def get_dir_sub(dir, dir_base):
+    dir_base = get_dir_base("reid", dir_base)
+    from ...utils.path import get_dir_sub
+    return get_dir_sub(dir, dir_base)
 

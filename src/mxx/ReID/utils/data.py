@@ -115,7 +115,7 @@ def save_img_tensor(img_tensor, dir_base, dir_sub, is_rm, is_norm):
     if os.path.exists(dir_save) and is_rm:
         shutil.rmtree(dir_save)
     if not os.path.exists(dir_save):
-        os.makedirs(dir_save)    
+        os.makedirs(dir_save)   
     if (len(img_tensor.shape) == 3):
         img_tensor = img_tensor.squeeze(0)
     if is_norm:

@@ -2,17 +2,24 @@ from PIL import Image
 import numpy as np
 import os
 import errno
+from ..ReID.utils.path import get_dir_sub, get_path, get_basename
+
 
 def make_mask_img(args):
-    (
-        path_manikin, 
-        path_mask,
-    ) = args
+    (cfg, root, file, logger) = args
+    if not file.endswith(('.jpg', '.png')):
+        return
+    dir_sub = get_dir_sub(root, cfg)
+    basename, ext = get_basename(file)
+    path_manikin = get_path(cfg, dir_sub, basename, ext, "manikin")
+    if not os.path.exists(path_manikin):
+        return
+    path_mask = get_path(cfg, dir_sub, basename, ext, "mask")
     img = Image.open(path_manikin).convert('L')
     arr = np.array(img)
     h, w = arr.shape
-    step_h = h // 8
-    step_w = w // 8
+    step_h = h // 6
+    step_w = w // 6
     for i in range(0, h, step_h):
         for j in range(0, w, step_w):
             block = arr[i:i+step_h, j:j+step_w]

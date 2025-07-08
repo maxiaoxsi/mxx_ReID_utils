@@ -1,25 +1,33 @@
 import os
 from ..annot_base import AnnotBase
 from ...utils.path import get_ext
-from ...ReID.utils.path import get_dir_sub, get_path_reid, get_path_annot
+from ...ReID.utils.path import get_dir_sub, get_path
 
-def annot_vl(args, idx_annot):
+def annot_vl(idx_annot, data_list, keys_text, cfg, logger):
     annot_list = []
     path_reid_list = []
-    for (cfg, root, file, logger) in args:
+    texts_annot_list = []
+    for (root, file) in data_list:
         dir_sub = get_dir_sub(root, cfg)
         basename, ext = get_ext(file) 
-        path_reid = get_path_reid(cfg, dir_sub, basename, ext)
-        path_annot = get_path_annot(cfg, dir_sub, basename)
+        path_reid = get_path(cfg, dir_sub, basename, ext, "reid")
+        path_annot = get_path(cfg, dir_sub, basename, ext, "annot")
         annot_temp = AnnotBase(path_annot=path_annot, logger=logger)
+        texts_annot = []
+        for key_text in  keys_text:
+            text_annot = f"{key_text}:{annot_temp.get_annot(key_text)}"
+            texts_annot.append(text_annot)
         if idx_annot not in annot_temp:
             annot_list.append(annot_temp)
             path_reid_list.append(path_reid)
+            texts_annot_list.append(texts_annot)
+
     if len(annot_list) == 0:
         return
     from ...qwen_vl.qwen import get_annot_batch
     text_list = get_annot_batch(
         path_img_list=path_reid_list,
+        texts_annot_list=texts_annot_list,
         idx_annot=idx_annot,
     )
     for annot, text in zip(annot_list, text_list):

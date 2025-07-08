@@ -22,6 +22,7 @@ def get_dir_sub(dir, dir_base):
         raise Exception("dir_base not a dir")
     return dir[len(dir_base) + 1:]
 
-def get_ext(file):
-    file = file.split('/')[-1]
-    return file.split('.')[0], file.split('.')[-1]
+def get_basename(name_file):
+    basename = name_file.split('.')[0]
+    ext = name_file.split('.')[-1]
+    return basename, ext

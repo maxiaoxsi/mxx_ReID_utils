@@ -6,7 +6,6 @@ from ..utils.annot.score import add_img_by_score
 from tqdm import tqdm
 
 
-
 class ImgSet(SetBase):
     def __init__(self) -> None:
         super().__init__()
@@ -55,27 +54,26 @@ class ImgSet(SetBase):
         idx_img_tgt = idx_img_tgt % len(img_list)
         return img_list[idx_img_tgt]
 
-    def get_img_ref(self, img_tgt, stage, is_select_bernl):
+    def get_img_ref_list(self, annot_tgt, stage, is_select_bernl):
         img_ref_list = []
-        list_img_sorted_dict = {}
+        img_sorted_list_drns = {}
         for drn in ["front", "back", "left", "right"]:
-            img_sorted_list = self.get_img_sorted_list(img_tgt, drn)
-            list_img_sorted_dict[drn] = img_sorted_list
+            img_sorted_list = self.get_img_sorted_list(annot_tgt, drn)
+            img_sorted_list_drns[drn] = img_sorted_list
             from ..utils.sample.sample import select_img_bernl
             img_ref = select_img_bernl(img_sorted_list, is_select_bernl)
             img_ref_list.append(img_ref)
-        return img_ref_list, list_img_sorted_dict
+        return img_ref_list, img_sorted_list_drns
 
-    def get_img_sorted_list(self, img_tgt, drn):
+    def get_img_sorted_list(self, annot_tgt, drn):
         img_cond_list = self.get_list_cond(drn)
         img_sorted_list = []
         for img in img_cond_list:
-            img.calib_score(img_tgt)
+            img.calib_score(annot_tgt)
             add_img_by_score(
                 img_list=img_sorted_list, 
                 img=img,
             )
-            # print(len(img_cond_list))
         return img_sorted_list
 
     @property

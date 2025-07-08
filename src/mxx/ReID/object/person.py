@@ -9,9 +9,9 @@ img_set: <list: <object.img>>, img for person
 video_set: <list: <object.video>>, video for person
 '''
 class Person:
-    def __init__(self, id, cache_person, dataset, logger) -> None:
+    def __init__(self, id, cache, dataset, logger) -> None:
         self._id = id
-        self._cache = cache_person
+        self._cache = cache
         self._img_set = None
         self._dataset = dataset
         self._logger = logger
@@ -29,30 +29,25 @@ class Person:
             self._img_set.add_item(basename, img)
         del self._cache
 
-    def get_sample(self, idx_video_tgt, idx_img_tgt, n_frame, stage, is_select_bernl):
+    def get_sample(self, idx_vid, idx_img, n_frame, stage, is_select_bernl):
         """Get a sample from the person's imgSet or videoSet"""
         """stage1: img, text: visible infrared"""
         """stage2: video"""
         """stage3: infrared only"""
         if self._img_set == None:
             self._load_cache()
-        if stage in [1, 3]:
-            (
-                img_ref_list, 
-                img_tgt_list, 
-                list_img_sorted_dict,
-            )= self._get_imgList_from_img_set(
-                stage=stage, 
-                idx_img_tgt=idx_img_tgt,
-                is_select_bernl=is_select_bernl
-            )
-        if stage in [2]:
-            img_ref_list, img_tgt_list = self._get_imgList_from_video_set(
-                stage=stage, 
-                idx_video_tgt=idx_video_tgt,
-                idx_img_tgt=idx_img_tgt,
-                n_frame=n_frame
-            )
+        
+        (
+            img_tgt_list,
+            img_ref_list,
+            _,
+        )= self.get_img_list(
+            idx_vid=idx_vid,
+            idx_img=idx_img,
+            n_frame=n_frame,
+            stage=stage, 
+            is_select_bernl=is_select_bernl
+        )
         from ..utils.data import get_annot_list, get_img_pil_list
         img_ref_pil_list = get_img_pil_list(img_ref_list, "reid")
         img_tgt_pil_list = get_img_pil_list(img_tgt_list, "reid")
@@ -82,29 +77,31 @@ class Person:
             'annot_tgt_list':annot_tgt_list
         }       
 
-    def _get_imgList_from_img_set(self, stage, idx_img_tgt, is_select_bernl):
+    def get_img_list(self, idx_vid, idx_img, n_frame, stage, is_select_bernl):
+        img_tgt_list = self.get_img_tgt_list(
+            idx_vid=idx_vid,
+            idx_img=idx_img,
+            n_frame=n_frame,
+            stage=stage,
+        )
+        annot_tgt = img_tgt_list[0].annot
+        
+        img_ref_list, img_sorted_list_drns = self.get_img_ref_list(
+            annot_tgt=annot_tgt, 
+            stage=stage, 
+            is_select_bernl=is_select_bernl,
+        )
+        return img_tgt_list, img_ref_list, img_sorted_list_drns
+
+    def get_img_tgt_list(self, idx_vid, idx_img, n_frame, stage):
         img_tgt = self._img_set.get_img_tgt(
             stage=stage,
-            idx_img_tgt=idx_img_tgt,
+            idx=idx_img,
         )
-
-        img_ref_list, list_img_sorted_dict = self._img_set.get_img_ref(
-            stage=stage, 
-            img_tgt=img_tgt, 
-            is_select_bernl=is_select_bernl
-        )
-        
-        img_tgt_list = [img_tgt]
-        return img_ref_list, img_tgt_list, list_img_sorted_dict
-
-    def _get_imgList_from_video_set(self, stage, idx_video_tgt, idx_img_tgt, n_frame):
-        img_ref_list = self._img_set.get_img_ref_list(stage=stage)
-        img_tgt_list = self._video_set.get_img_tgt_list(
-            idx_video_tgt=idx_video_tgt,
-            idx_img_tgt=idx_img_tgt,
-            n_frame=n_frame
-        )
-        return img_ref_list, img_tgt_list
+        return [img_tgt]
+    
+    def get_img_ref_list(self, annot_tgt, stage, is_select_bernl):
+        return self._img_set.get_img_ref_list(annot_tgt, stage, is_select_bernl)
     
     def __getitem__(self, idx):
         return self._img_set[idx]
