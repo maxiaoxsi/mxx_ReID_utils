@@ -18,8 +18,8 @@ def make_mask_img(args):
     img = Image.open(path_manikin).convert('L')
     arr = np.array(img)
     h, w = arr.shape
-    step_h = h // 6
-    step_w = w // 6
+    step_h = h // 8
+    step_w = w // 7
     for i in range(0, h, step_h):
         for j in range(0, w, step_w):
             block = arr[i:i+step_h, j:j+step_w]

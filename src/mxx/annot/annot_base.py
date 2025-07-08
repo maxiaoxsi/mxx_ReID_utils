@@ -18,6 +18,7 @@ class AnnotBase:
             if not os.path.exists(dir_annot):
                 os.makedirs(dir_annot)
                 self._save_annot()
+            print(self._path_annot)
             warnings.warn("mxx object annotation: annotation yaml file not exists, we have ceate empty one")
     
 
