@@ -7,8 +7,8 @@ def load_cfg(path_cfg, is_check=True):
     if is_check:
         check_cfg_dir(cfg['dir']['reid'])
         check_cfg_dir(cfg['dir']['smplx'])
-        check_cfg_dir(cfg['dir']['annot'])
-        check_cfg_dir(cfg['dir']['mask'])
+        # check_cfg_dir(cfg['dir']['annot'])
+        # check_cfg_dir(cfg['dir']['mask'])
     return cfg
 
 def get_ext(key, ext):

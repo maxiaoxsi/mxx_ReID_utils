@@ -33,55 +33,9 @@ def annot_vl(idx_annot, data_list, keys_text, cfg, logger):
     for annot, text in zip(annot_list, text_list):
         annot.set_annot(idx_annot, text)
 
-# def annot_is_smplx(cfg, root, file):
-#     if not file.endswith(('.jpg', '.png')):
-#         return
-#     dir_reid = cfg["dir"]["reid"]
-#     dir_annot = cfg["dir"]["annot"]
-#     dir_sub = root[len(dir_reid) + 1:]
-#     name_file = file.split('/')[-1]
-#     name_file = file.split('/')[-1]
-#     suff_file = name_file.split('.')[-1]
-#     name_file = name_file.split('.')[0]
-#     logger = Logger('./batch.log')
-#     path_annot = os.path.join(dir_annot, dir_sub, f'{name_file}.yaml')
-#     annot_temp = AnnotBase(path_annot=path_annot, logger=logger)
-#     if 'is_smplx' in annot_temp:
-#         return
-#     dir_smplx = cfg["dir"]['smplx']
-#     path_smplx_guid = os.path.join(dir_smplx, 
-#         dir_sub, 'manikin', f'{name_file}.{suff_file}')
-#     if os.path.exists(path_smplx_guid):
-#         annot_temp.set_annot('is_smplx', 'True')
-#     else:
-#         annot_temp.set_annot('is_smplx', 'False')
 
-# def annot_drn_smplx(cfg, root, file, logger):
-#     if not file.endswith(('.jpg', '.png')):
-#         return
-#     dir_reid = cfg["dir"]["reid"]
-#     dir_smplx = cfg["dir"]["smplx"]
-#     dir_annot = cfg["dir"]["annot"]
-#     dir_sub = root[len(dir_reid) + 1:]
-#     name_file = file.split('/')[-1]
-#     name_file = file.split('/')[-1]
-#     suff_file = name_file.split('.')[-1]
-#     name_file = name_file.split('.')[0]
-#     path_annot = os.path.join(dir_annot, dir_sub, f'{name_file}.yaml')
-#     annot_temp = AnnotBase(path_annot=path_annot, logger=logger)
-#     if 'drn_smplx' in annot_temp and 'vec_drn_smplx' in annot_temp:
-#         return
-#     path_smplx_pred = os.path.join(dir_smplx, 
-#         dir_sub, 'pred', f'{name_file}.npz')
-#     if not os.path.exists(path_smplx_pred):
-#         return
-#     smplx_pred = np.load(path_smplx_pred)
-#     from ..smplx.utils.drn import init_direction
-#     direction, vector_direction, mark_direction = init_direction(smplx_pred)
-#     print(direction)
-#     print(vector_direction)
-#     annot_temp.set_annot('drn_smplx', direction)
-#     annot_temp.set_annot('vec_drn_smplx', vector_direction)
+
+
 
 # def annot_is_backpack(cfg, root, file, model_qwen, processor_qwen, logger):
 #     if not file.endswith(('.jpg', '.png')):

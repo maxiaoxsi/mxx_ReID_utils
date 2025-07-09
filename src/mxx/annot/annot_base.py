@@ -7,19 +7,22 @@ class AnnotBase:
         self._path_annot = path_annot
         self._logger = logger
         self._annot = {}
-        dir_annot = os.path.dirname(path_annot)
-        self._load_annot(dir_annot)
+        self._load_annot()
 
-    def _load_annot(self, dir_annot):
+    def _load_annot(self):
         if os.path.exists(self._path_annot):
             with open(self._path_annot, 'r') as f:
                 self._annot = yaml.safe_load(f)
+                if self._annot is None:
+                    self._logger(f"[annot_base] empty file in {self._path_annot}")
+                    self._annot = {}
+                    self._save_annot()
         else:
+            dir_annot = os.path.dirname(self._path_annot)
             if not os.path.exists(dir_annot):
-                os.makedirs(dir_annot)
-                self._save_annot()
-            print(self._path_annot)
-            warnings.warn("mxx object annotation: annotation yaml file not exists, we have ceate empty one")
+                os.makedirs(dir_annot, exist_ok=True)
+            self._save_annot()
+            self._logger(f'[annot_base]: create annot file in {self._path_annot}')
     
 
     def _save_annot(self):
@@ -33,6 +36,8 @@ class AnnotBase:
             )
 
     def __contains__(self, idx):
+        if self._annot is None:
+            self._logger(f"[annot_base] empty file in {self._path_annot}")
         return idx in self._annot
 
     def get_annot(self, idx):

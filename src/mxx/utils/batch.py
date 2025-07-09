@@ -17,9 +17,9 @@ def count_files(path):
         total += len(files)
     return total
 
-def process_batch(
+def process_reid_batch(
     path_cfg, 
-    name_proc, 
+    name_processing, 
     method,
     batch_size,
     max_workers=4,
@@ -29,7 +29,7 @@ def process_batch(
     n_files = count_files(dir_reid)
     logger = Logger('./batch.log')
     data_list = []
-    with tqdm(total=n_files, desc=f"Processing {name_proc}") as pbar:
+    with tqdm(total=n_files, desc=f"Processing {name_processing}") as pbar:
         for root, dirs, files in os.walk(dir_reid):
             for file in files:
                 data_list.append((cfg, root, file, logger))
@@ -42,7 +42,7 @@ def process_batch(
             list(executor.map(method, data_list))
         pbar.update(len(data_list))
 
-def process_batch_vl(
+def process_reid_batch_vl(
     path_cfg, 
     keys_text,
     name_batch, 
