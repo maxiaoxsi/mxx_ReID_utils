@@ -1,6 +1,6 @@
 import os
 import yaml
-import warnings
+import fcntl
 
 class AnnotBase:
     def __init__(self, path_annot, logger):
@@ -27,13 +27,17 @@ class AnnotBase:
 
     def _save_annot(self):
         with open(self._path_annot, 'w', encoding='utf-8') as f:
-            yaml.safe_dump(
-                self._annot, 
-                f, 
-                allow_unicode=True, 
-                default_flow_style=False,
-                sort_keys=False 
-            )
+            fcntl.flock(f, fcntl.LOCK_EX)
+            try:
+                yaml.safe_dump(
+                    self._annot, 
+                    f, 
+                    allow_unicode=True, 
+                    default_flow_style=False,
+                    sort_keys=False 
+                )
+            finally:
+                fcntl.flock(f, fcntl.LOCK_UN)
 
     def __contains__(self, idx):
         if self._annot is None:

@@ -1,7 +1,6 @@
 import os
 from ..annot_base import AnnotBase
-from ...utils.path import get_ext
-from ...ReID.utils.path import get_dir_sub, get_path
+from ...ReID.utils.path import get_basename, get_dir_sub, get_path
 
 def annot_vl(idx_annot, data_list, keys_text, cfg, logger):
     annot_list = []
@@ -9,7 +8,7 @@ def annot_vl(idx_annot, data_list, keys_text, cfg, logger):
     texts_annot_list = []
     for (root, file) in data_list:
         dir_sub = get_dir_sub(root, cfg)
-        basename, ext = get_ext(file) 
+        basename, ext = get_basename(file) 
         path_reid = get_path(cfg, dir_sub, basename, ext, "reid")
         path_annot = get_path(cfg, dir_sub, basename, ext, "annot")
         annot_temp = AnnotBase(path_annot=path_annot, logger=logger)
@@ -77,7 +76,7 @@ def annot_vl(idx_annot, data_list, keys_text, cfg, logger):
 #     # path_annot_list = []
 #     for (cfg, root, file, logger) in args:
 #         dir_sub = get_dir_sub(root, cfg)
-#         basename, ext = get_ext(file) 
+#         basename, ext = get_basename(file) 
 #         path_reid = get_path_reid(cfg, dir_sub, basename, ext)
 #         path_annot = get_path_annot(cfg, dir_sub, basename)
 #         annot_temp = AnnotBase(path_annot=path_annot, logger=logger)

@@ -96,7 +96,7 @@ class Person:
     def get_img_tgt_list(self, idx_vid, idx_img, n_frame, stage):
         img_tgt = self._img_set.get_img_tgt(
             stage=stage,
-            idx=idx_img,
+            idx_img=idx_img,
         )
         return [img_tgt]
     

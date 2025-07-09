@@ -12,12 +12,12 @@ if __name__ == '__main__':
     parser.add_argument("--is_smplx", type=str, default="False")
     parser.add_argument("--drn", type=str, default="False")
     parser.add_argument("--is_visible", type=str, default="False")
-    parser.add_argument("--is_backpack", type=str, default="False")
-    parser.add_argument("--is_shoulder_bag", type=str, default="False")
-    parser.add_argument("--is_hand_carried", type=str, default="False")
-    parser.add_argument("--upper", type=str, default="False")
-    parser.add_argument("--color_upper", type=str, default="False")
-    parser.add_argument("--style_upper", type=str, default="False")
+    parser.add_argument("--is_backpack_vl", type=str, default="False")
+    parser.add_argument("--is_shoulder_bag_vl", type=str, default="False")
+    parser.add_argument("--is_hand_carried_vl", type=str, default="False")
+    parser.add_argument("--upper_vl", type=str, default="False")
+    parser.add_argument("--color_upper_vl", type=str, default="False")
+    parser.add_argument("--style_upper_vl", type=str, default="False")
     parser.add_argument("--bottoms", type=str, default="False")
     parser.add_argument("--color_bottoms", type=str, default="False")
     parser.add_argument("--style_bottoms", type=str, default="False")
@@ -56,94 +56,110 @@ if __name__ == '__main__':
             batch_size=batch_size,
             max_workers=max_workers,
         )
-    exit()
-    if get_arg_bool(args.is_backpack):
+    if get_arg_bool(args.is_backpack_vl):
         from mxx.annot.utils.annot_vl import annot_vl
         process_reid_batch_vl(
             path_cfg=path_cfg,
             keys_text=[],
-            name_processing="annoting is_backpack",
+            name_processing="annoting is_backpack_vl",
             method_batch=annot_vl,
             batch_size=batch_size,
-            idx_annot="is_backpack",
+            idx_annot="is_backpack_vl",
         )
-    if get_arg_bool(args.is_shoulder_bag):
+        exit()
+
+    if get_arg_bool(args.is_shoulder_bag_vl):
         from mxx.annot.utils.annot_vl import annot_vl
         process_reid_batch_vl(
             path_cfg=path_cfg,
             keys_text=[],
-            name_processing="annoting is_shoulder_bag",
+            name_processing="annoting is_shoulder_bag_vl",
             method_batch=annot_vl,
             batch_size=batch_size,
-            idx_annot="is_shoulder_bag",
+            idx_annot="is_shoulder_bag_vl",
         )
-    if get_arg_bool(args.is_hand_carried):
+        exit()
+
+    if get_arg_bool(args.is_hand_carried_vl):
         from mxx.annot.utils.annot_vl import annot_vl
         process_reid_batch_vl(
             path_cfg=path_cfg,
             keys_text=[],
-            name_processing="annoting is_hand_carried",
+            name_processing="annoting is_hand_carried_vl",
             method_batch=annot_vl,
             batch_size=batch_size,
-            idx_annot="is_hand_carried",
+            idx_annot="is_hand_carried_vl",
         )
-    if get_arg_bool(args.upper):
+        exit()
+
+    if get_arg_bool(args.upper_vl):
         from mxx.annot.utils.annot_vl import annot_vl
         process_reid_batch_vl(
             path_cfg=path_cfg,
             keys_text=[],
-            name_processing="annoting upper",
+            name_processing="annoting upper_vl",
             method_batch=annot_vl,
             batch_size=batch_size,
-            idx_annot="upper",
+            idx_annot="upper_vl",
         )
-    if get_arg_bool(args.color_upper):
+        exit()
+
+    if get_arg_bool(args.color_upper_vl):
         from mxx.annot.utils.annot_vl import annot_vl
         process_reid_batch_vl(
             path_cfg=path_cfg,
             keys_text=['upper'],
-            name_processing="annoting color_upper",
+            name_processing="annoting color_upper_vl",
             method_batch=annot_vl,
             batch_size=batch_size,
-            idx_annot="color_upper",
+            idx_annot="color_upper_vl",
         )
-    if get_arg_bool(args.style_upper):
+        exit()
+
+    if get_arg_bool(args.style_upper_vl):
         from mxx.annot.utils.annot_vl import annot_vl
         process_reid_batch_vl(
             path_cfg=path_cfg,
             keys_text=['upper'],
-            name_processing="annoting style_upper",
+            name_processing="annoting style_upper_vl",
             method_batch=annot_vl,
             batch_size=batch_size,
-            idx_annot="style_upper",
+            idx_annot="style_upper_vl",
         )
-    if get_arg_bool(args.bottoms):
+        exit()
+
+    if get_arg_bool(args.bottoms_vl):
         from mxx.annot.utils.annot_vl import annot_vl
         process_reid_batch_vl(
             path_cfg=path_cfg,
             keys_text=[],
-            name_processing="annoting bottoms",
+            name_processing="annoting bottoms_vl",
             method_batch=annot_vl,
             batch_size=batch_size,
-            idx_annot="bottoms",
+            idx_annot="bottoms_vl",
         )
-    if get_arg_bool(args.color_bottoms):
+        exit()
+
+    if get_arg_bool(args.color_bottoms_vl):
         from mxx.annot.utils.annot_vl import annot_vl
         process_reid_batch_vl(
             path_cfg=path_cfg,
             keys_text=['bottoms'],
-            name_processing="annoting color_bottoms",
+            name_processing="annoting color_bottoms_vl",
             method_batch=annot_vl,
             batch_size=batch_size,
-            idx_annot="color_bottoms",
+            idx_annot="color_bottoms_vl",
         )
-    if get_arg_bool(args.style_bottoms):
+        exit()
+
+    if get_arg_bool(args.style_bottoms_vl):
         from mxx.annot.utils.annot_vl import annot_vl
         process_reid_batch_vl(
             path_cfg=path_cfg,
             keys_text=['bottoms'],
-            name_processing="annoting style_bottoms",
+            name_processing="annoting style_bottoms_vl",
             method_batch=annot_vl,
             batch_size=batch_size,
-            idx_annot="style_bottoms",
+            idx_annot="style_bottoms_vl",
         )
+        exit()

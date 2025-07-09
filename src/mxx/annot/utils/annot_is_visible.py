@@ -5,7 +5,7 @@ from ...ReID.utils.path import get_basename, get_dir_sub, get_path
 from ...annot.annot_base import AnnotBase
 from ...utils.check import check_is_file_img
 
-def annot_drn(args):
+def annot_is_visible(args):
     (cfg, root, file, logger) = args
     if not check_is_file_img(file):
         return

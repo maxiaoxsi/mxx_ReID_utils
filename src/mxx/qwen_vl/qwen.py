@@ -44,6 +44,18 @@ Answer with a brief phrase 'color' from phrase 'color' + 'style'\
 such as answer 'red' when the text is 'bottoms_vl:red shorts'. \
 A brief phrase is enough, no full sentences."
 
+    prompts["style_upper_vl"] = "Could you please describe \
+the style of the upper clothing from the text phrase upper_vl? \
+Answer with a brief phrase 'style' from phrase 'color' + 'style' \
+such as answer 't-shirt' when the text is 'upper_vl:white t-shirt'. \
+A brief phrase is enough, no full sentences."
+
+    prompts["style_bottoms_vl"] = "Could you please describe \
+the style of the bottoms from the text phrase bottoms_vl?\
+Answer with a brief phrase 'style' from phrase 'color' + 'style'\
+such as answer 'shorts' when the text is 'bottoms_vl:red shorts'. \
+A brief phrase is enough, no full sentences."
+
     prompts["is_shoulder_bag_vl"] = "Could you please describe \
 is the person in the photo carrying a shoulder bag?\
 please anwser with a brief phrase 'yes' or 'no'"

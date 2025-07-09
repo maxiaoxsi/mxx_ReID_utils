@@ -40,19 +40,19 @@ class ImgSet(SetBase):
                 self._list_cond['back'].append(item)
         return self._list_cond[cond]
 
-    def get_img_tgt(self, idx_img_tgt, stage):
-        if isinstance(idx_img_tgt, str):
-            return self[idx_img_tgt]
+    def get_img_tgt(self, idx_img, stage):
+        if isinstance(idx_img, str):
+            return self[idx_img]
         if stage in [1, 2, 4]:
             img_list = self.get_list_cond('tgt')
         elif stage in [3]:
             img_list = self.get_list_cond('infrared')
         if len(img_list) == 0:
             raise Exception("img_set: img_list empty!")
-        if idx_img_tgt < 0:
-            idx_img_tgt = random.randint(0, len(img_list) - 1)
-        idx_img_tgt = idx_img_tgt % len(img_list)
-        return img_list[idx_img_tgt]
+        if idx_img < 0:
+            idx_img = random.randint(0, len(img_list) - 1)
+        idx_img = idx_img % len(img_list)
+        return img_list[idx_img]
 
     def get_img_ref_list(self, annot_tgt, stage, is_select_bernl):
         img_ref_list = []

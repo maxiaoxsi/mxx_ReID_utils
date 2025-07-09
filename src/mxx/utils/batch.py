@@ -27,7 +27,7 @@ def process_reid_batch(
     cfg = load_cfg(path_cfg)
     dir_reid = cfg["dir"]["reid"]
     n_files = count_files(dir_reid)
-    logger = Logger('./batch.log')
+    logger = Logger('./annot_dataset_reid.log')
     data_list = []
     with tqdm(total=n_files, desc=f"Processing {name_processing}") as pbar:
         for root, dirs, files in os.walk(dir_reid):
@@ -45,7 +45,7 @@ def process_reid_batch(
 def process_reid_batch_vl(
     path_cfg, 
     keys_text,
-    name_batch, 
+    name_processing, 
     method_batch,
     idx_annot,
     batch_size,
@@ -53,9 +53,9 @@ def process_reid_batch_vl(
     cfg = load_cfg(path_cfg)
     dir_reid = cfg["dir"]["reid"]
     n_files = count_files(dir_reid)
-    logger = Logger('./batch.log')
+    logger = Logger('./annot_dataset_reid.log')
     data_list = []
-    with tqdm(total=n_files, desc=f"Processing {name_batch}") as pbar:
+    with tqdm(total=n_files, desc=f"Processing {name_processing}") as pbar:
         for root, dirs, files in os.walk(dir_reid):
             for file in files:
                 data_list.append((root, file))
