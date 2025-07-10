@@ -155,14 +155,11 @@ class Cache:
                 n_frame = vid['n_frame']
                 for i in range(1, n_frame + 1):
                     basename = f"{id_p}{id_v}F{str(i).zfill(3)}"
-                    path_reid = get_path(self._dir, id_p, basename, ext)
-                    print(path_reid)
-                    if not os.path.exists(n_frame):
+                    path_reid = get_path(self._dir, id_p, basename, ext, "reid")
+                    if not os.path.exists(path_reid):
                         vid['n_frame'] = i - 1
                         vid['frame_without_smplx'] = [item for item in vid['frame_without_smplx'] if item < i]
                         break
-                    raise Exception("250709 check path_reid!!")
-
 
     @property
     def type(self):

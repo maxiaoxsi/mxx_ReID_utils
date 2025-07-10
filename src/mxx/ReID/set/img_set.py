@@ -5,6 +5,11 @@ from ..object.img import Img
 from ..utils.annot.score import add_img_by_score
 from tqdm import tqdm
 
+def get_img_standby(img_ref_list, img_sorted_list):
+    for img in img_sorted_list:
+        if img not in img_ref_list:
+            return img
+    return None
 
 class ImgSet(SetBase):
     def __init__(self) -> None:
@@ -60,9 +65,35 @@ class ImgSet(SetBase):
         for drn in ["front", "back", "left", "right"]:
             img_sorted_list = self.get_img_sorted_list(annot_tgt, drn)
             img_sorted_list_drns[drn] = img_sorted_list
-            from ..utils.sample.sample import select_img_bernl
-            img_ref = select_img_bernl(img_sorted_list, is_select_bernl)
+        for drn in ["front", "back", "left", "right"]:
+            img_sorted_list = img_sorted_list_drns[drn]
+            if len(img_sorted_list) > 0:
+                img_standby = get_img_standby(img_ref_list, img_sorted_list)
+                if img_standby is not None:
+                    img_ref = None
+                    from ..utils.sample.sample import select_img_bernl
+                    for i in range(7): 
+                        img = select_img_bernl(img_sorted_list, is_select_bernl)
+                        if img not in img_ref_list:
+                            img_ref = img
+                            break
+                    if img_ref == None:
+                        img_ref = img_standby
+                    img_ref_list.append(img_ref)
+                    continue 
+            img_ref = None
+            for drn_sub in ["front", "left", "right", "back"]:
+                img_sorted_list = img_sorted_list_drns[drn_sub]
+                if len(img_sorted_list) == 0:
+                    continue
+                for img in img_sorted_list:
+                    if img not in img_ref_list:
+                        img_ref = img
+                        break
+                if img_ref is not None:
+                    break
             img_ref_list.append(img_ref)
+                
         return img_ref_list, img_sorted_list_drns
 
     def get_img_sorted_list(self, annot_tgt, drn):
