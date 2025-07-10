@@ -11,15 +11,23 @@ def make_mask(path_reid, path_manikin):
     h, w = arr.shape
     step_h = h // 8
     step_w = w // 8
+    cache = []
     for i in range(0, h, step_h):
         for j in range(0, w, step_w):
             end_i = min(i + step_h, h)
             end_j = min(j + step_w, w)
             block = arr[i:end_i, j:end_j]
+            start_i = max(0, i - step_h // 8)
+            end_i = min(i + step_h + step_h // 8, h)
+            start_j = max(0, j - step_w // 8)
+            end_j = min(j + step_w + step_w // 8, w)
             if np.any(block > 10):
-                arr[i:i+step_h, j:j+step_w] = 1
+                cache.append((start_i, end_i, start_j, end_j))
             else:
-                arr[i:i+step_h, j:j+step_w] = 0
+                arr[start_i:end_i, start_j:end_j] = 0
+    for (start_i, end_i, start_j, end_j) in cache:
+        arr[start_i:end_i, start_j:end_j] = 1
+        
     img_mask = Image.fromarray((arr > 0).astype(np.uint8) * 255)
     img_reid = Image.open(path_reid)
     img_fore = Image.new("RGB", (w, h), (0, 0, 0))  # Black background
