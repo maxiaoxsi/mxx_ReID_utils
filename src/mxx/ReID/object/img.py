@@ -108,10 +108,18 @@ class Img:
         return text
 
     def get_text_ref(self):
+        is_visible = self["is_visible"]
         annot_upper = self["upper"]
         annot_bottoms = self["bottoms"]
-        text = f'a photo of a people wearing {annot_upper} and {annot_bottoms}.'
-        # a photo of a people wearing red t-shirt and dark shorts, with a backpack,
+        if is_visible in [True, 'True']:
+            str_visible = 'visible'
+        elif is_visible in [False, 'False']:
+            str_visible = 'infrared'
+        else:
+            str_visible = 'visible'
+            self._logger(f'[img] annot visible wrong: {is_visible}')
+        text = f'a {str_visible} photo of a people wearing {annot_upper} and {annot_bottoms}.'
+        # a visible photo of a people wearing red t-shirt and dark shorts, with a backpack,
         return text
     
 

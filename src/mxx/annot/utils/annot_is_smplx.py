@@ -6,7 +6,7 @@ from ...utils.check import check_is_file_img
 
 def annot_is_smplx(args):
     (cfg, root, file, logger) = args
-    if check_is_file_img(file):
+    if not check_is_file_img(file):
         return
     dir_sub = get_dir_sub(root, cfg)
     basename, ext = get_basename(file)

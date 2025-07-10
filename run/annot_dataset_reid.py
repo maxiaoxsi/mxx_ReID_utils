@@ -18,9 +18,9 @@ if __name__ == '__main__':
     parser.add_argument("--upper_vl", type=str, default="False")
     parser.add_argument("--color_upper_vl", type=str, default="False")
     parser.add_argument("--style_upper_vl", type=str, default="False")
-    parser.add_argument("--bottoms", type=str, default="False")
-    parser.add_argument("--color_bottoms", type=str, default="False")
-    parser.add_argument("--style_bottoms", type=str, default="False")
+    parser.add_argument("--bottoms_vl", type=str, default="False")
+    parser.add_argument("--color_bottoms_vl", type=str, default="False")
+    parser.add_argument("--style_bottoms_vl", type=str, default="False")
     args = parser.parse_args()
     path_cfg = args.path_cfg
     batch_size = args.batch_size
@@ -36,6 +36,8 @@ if __name__ == '__main__':
             batch_size=batch_size,
             max_workers=max_workers,
         )
+        exit()
+
     if get_arg_bool(args.drn):
         from mxx.annot.utils.annot_drn import annot_drn
         print("annot drn start!")
@@ -46,6 +48,8 @@ if __name__ == '__main__':
             batch_size=batch_size,
             max_workers=max_workers,
         )
+        exit()
+
     if get_arg_bool(args.is_visible):
         from mxx.annot.utils.annot_is_visible import annot_is_visible
         print("annot is_visible start!")
@@ -56,6 +60,8 @@ if __name__ == '__main__':
             batch_size=batch_size,
             max_workers=max_workers,
         )
+        exit()
+
     if get_arg_bool(args.is_backpack_vl):
         from mxx.annot.utils.annot_vl import annot_vl
         process_reid_batch_vl(
@@ -116,18 +122,6 @@ if __name__ == '__main__':
         )
         exit()
 
-    if get_arg_bool(args.style_upper_vl):
-        from mxx.annot.utils.annot_vl import annot_vl
-        process_reid_batch_vl(
-            path_cfg=path_cfg,
-            keys_text=['upper'],
-            name_processing="annoting style_upper_vl",
-            method_batch=annot_vl,
-            batch_size=batch_size,
-            idx_annot="style_upper_vl",
-        )
-        exit()
-
     if get_arg_bool(args.bottoms_vl):
         from mxx.annot.utils.annot_vl import annot_vl
         process_reid_batch_vl(
@@ -149,17 +143,5 @@ if __name__ == '__main__':
             method_batch=annot_vl,
             batch_size=batch_size,
             idx_annot="color_bottoms_vl",
-        )
-        exit()
-
-    if get_arg_bool(args.style_bottoms_vl):
-        from mxx.annot.utils.annot_vl import annot_vl
-        process_reid_batch_vl(
-            path_cfg=path_cfg,
-            keys_text=['bottoms'],
-            name_processing="annoting style_bottoms_vl",
-            method_batch=annot_vl,
-            batch_size=batch_size,
-            idx_annot="style_bottoms_vl",
         )
         exit()

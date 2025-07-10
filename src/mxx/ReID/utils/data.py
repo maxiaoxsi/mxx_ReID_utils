@@ -59,7 +59,7 @@ def save_sample(sample, dir_base, is_norm):
         save_text_list(text_ref_list, dir_base, 'ref', False)
         if 'img_tgt_tensor' not in sample:
             os.makedirs(os.path.join(dir_base, 'tgt'), exist_ok=True)
-            save_text_list(text_tgt_list, dir_base, 'tgt', False)
+        save_text_list(text_tgt_list, dir_base, 'tgt', False)
 
 def save_text_list(text_list, dir_base, dir_sub, is_rm):
     dir_save = os.path.join(dir_base, dir_sub)
@@ -149,6 +149,7 @@ def get_img_pil_list(img_list, key):
         else None
         for img in img_list 
     ]
+
 
 def load_samples(samples, bs):
     samples_id_person = []
