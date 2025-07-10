@@ -29,7 +29,7 @@ class Person:
             self._img_set.add_item(basename, img)
         del self._cache
 
-    def get_sample(self, idx_vid, idx_img, n_frame, stage, is_select_bernl):
+    def get_sample(self, idx_vid, idx_img, n_frame, stage, is_select_bernl, rate_back):
         """Get a sample from the person's imgSet or videoSet"""
         """stage1: img, text: visible infrared"""
         """stage2: video"""

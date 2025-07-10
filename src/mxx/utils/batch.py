@@ -70,33 +70,33 @@ def process_reid_batch_vl(
 
 
 
-# def process_smplx_batch(path_cfg):
-#     from ..smplx.smplx import render_skeleton
-#     cfg = load_cfg(path_cfg)
-#     dir_reid = cfg["dir"]["reid"]
-#     n_files = count_files(dir_reid)
-#     data_list = []
-#     with tqdm(total=n_files, desc="Processing get skeleton") as pbar:
-#         for root, dirs, files in os.walk(dir_reid):
-#             for dir in dirs:
-#                 pbar.update(1)
-#             for file in files:
-#                 if not file.endswith(('.jpg', '.png')):
-#                     pbar.update(1)
-#                     continue
-#                 dir_reid = cfg["dir"]["reid"]
-#                 dir_smplx = cfg["dir"]["smplx"]
-#                 dir_sub = root[len(dir_reid) + 1:]
+def process_smplx_batch(path_cfg):
+    from ..smplx.smplx import render_skeleton
+    cfg = load_cfg(path_cfg)
+    n_files = count_files(dir_reid)
+    data_list = []
+    with tqdm(total=n_files, desc="Processing get skeleton") as pbar:
+        for root, dirs, files in os.walk(dir_reid):
+            for dir in dirs:
+                pbar.update(1)
+            for file in files:
+                if not file.endswith(('.jpg', '.png')):
+                    pbar.update(1)
+                    continue
+                dir_sub = get_dir_sub
+                dir_reid = cfg["dir"]["reid"]
+                dir_smplx = cfg["dir"]["smplx"]
+                dir_sub = root[len(dir_reid) + 1:]
                 
-#                 data_list.append((path_reid, path_pred, path_skeleton))
-#                 if len(data_list) == 64:
-#                     with ProcessPoolExecutor(max_workers=8) as executor:
-#                         list(executor.map(render_skeleton, data_list))
-#                     data_list = []
-#                     pbar.update(64)
-#         with ProcessPoolExecutor(max_workers=8) as executor:
-#             list(executor.map(render_skeleton, data_list))
-#             pbar.update(len(data_list))    
+                data_list.append((path_reid, path_pred, path_skeleton))
+                if len(data_list) == 64:
+                    with ProcessPoolExecutor(max_workers=8) as executor:
+                        list(executor.map(render_skeleton, data_list))
+                    data_list = []
+                    pbar.update(64)
+        with ProcessPoolExecutor(max_workers=8) as executor:
+            list(executor.map(render_skeleton, data_list))
+            pbar.update(len(data_list))    
 
 # def rename_guidance(cfg, root, dir):
 #     dir_smplx = cfg["dir"]["smplx"]

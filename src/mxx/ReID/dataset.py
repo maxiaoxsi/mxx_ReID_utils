@@ -31,6 +31,7 @@ class ReIDDataset(Dataset):
         rate_dropout_ref=0.2,
         rate_dropout_back=0.2,
         rate_dropout_smplx=0.2,
+        rate_back = 1,
         width_scale=(1, 1),
         height_scale=(1, 1),
         img_size=(512, 512),
@@ -44,6 +45,7 @@ class ReIDDataset(Dataset):
         self._rate_dropout_ref = rate_dropout_ref
         self._rate_dropout_back = rate_dropout_back
         self._rate_dropout_smplx = rate_dropout_smplx
+        self._rate_back = rate_back
         self._logger = Logger(path_log=path_log)
         
         cfg = load_cfg(path_cfg)
@@ -91,6 +93,7 @@ class ReIDDataset(Dataset):
             n_frame=self.n_frame,
             stage=self.stage,
             is_select_bernl = self.is_select_bernl,
+            rate_back = self.rate_back
         )
         seed = int(time.time())
         img_ref_tensor_list = self.get_img_tensor_list(
@@ -305,6 +308,9 @@ class ReIDDataset(Dataset):
     def is_select_bernl(self):
         return self._is_select_bernl
 
+    @property
+    def rate_back(self):
+        return self._rate_back
 
     def load_sample_from_dir(self, dir_sample, path_manikin=None, path_skeleton=None):
         samples = {}

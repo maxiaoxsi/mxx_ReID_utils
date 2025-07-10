@@ -1,12 +1,12 @@
 import argparse
 from mxx.utils.batch import process_reid_batch
 
-def make_mask(path_cfg, batch_size, max_workers):
-    from mxx.utils.mask import make_mask_img
+def render_smplx(path_cfg, batch_size, max_workers):
+    from mxx.smplx.utils.render import render_skeleton
     process_reid_batch(
         path_cfg=path_cfg,
-        name_processing="mask dataset",
-        method=make_mask_img,
+        name_processing="render skeleton",
+        method=render_skeleton,
         batch_size=batch_size,
         max_workers=max_workers,
     )
@@ -23,4 +23,4 @@ if __name__ == '__main__':
     path_cfg = args.path_cfg
     batch_size = args.batch_size
     max_workers = args.max_workers
-    make_mask(path_cfg, batch_size, max_workers)
+    render_smplx(path_cfg, batch_size, max_workers)

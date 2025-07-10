@@ -45,20 +45,20 @@ class Img:
 
     def get_img_pil(self, key):
         """Return the image as a PIL Image object."""
-        if key in ['background', 'foreground']:
+        if key in ['mask', 'background', 'foreground']:
             path_reid = get_path(self.dir, self.dir_sub, self.basename, self.ext, "reid")
-            path_mask = get_path(self.dir, self.dir_sub, self.basename, self.ext, "mask")
-            from ...utils.mask import make_back_and_fore_img
-            img_fore, img_back = make_back_and_fore_img(
-                path_reid=path_reid, 
-                path_mask=path_mask
-            )
+            path_manikin = get_path(self.dir, self.dir_sub, self.basename, self.ext, "manikin")
+            from ...utils.mask import make_mask
+            img_mask, img_fore, img_back = make_mask(path_manikin=path_manikin, path_reid=path_reid)
+            if key == "mask":
+                return img_mask
             if key == "background":
                 return img_back
             elif key == "foreground":
                 return img_fore
 
         path = get_path(self.dir, self.dir_sub, self.basename, self.ext, key)
+        print(path)
         if not os.path.exists(path):
             raise Exception("path not exists")
         

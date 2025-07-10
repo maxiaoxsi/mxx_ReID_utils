@@ -69,7 +69,8 @@ def render_skeleton(args):
         ) = args
         if model_smplx is None:
             model_smplx, kps_lines = load_smplx(
-                path_smplx_model = '/machangxiao/code/smplx/models'
+                path_smplx_model = '/machangxiao/code/SMPLest-X/human_models/human_model_files'
+                #'/machangxiao/code/smplx/models'
             )
         data_load = np.load(path_pred)
         betas = torch.from_numpy(data_load['smplx_shape']).float().to("cuda")      # [1, num_betas]
