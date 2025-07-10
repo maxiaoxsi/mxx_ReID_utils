@@ -33,9 +33,6 @@ def annot_vl(idx_annot, data_list, keys_text, cfg, logger):
         annot.set_annot(idx_annot, text)
 
 
-
-
-
 # def annot_is_backpack(cfg, root, file, model_qwen, processor_qwen, logger):
 #     if not file.endswith(('.jpg', '.png')):
 #         return

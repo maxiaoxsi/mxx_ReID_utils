@@ -12,6 +12,7 @@ if __name__ == '__main__':
     parser.add_argument("--is_smplx", type=str, default="False")
     parser.add_argument("--drn", type=str, default="False")
     parser.add_argument("--is_visible", type=str, default="False")
+    parser.add_argument("--is_riding_vl", type=str, default="False")
     parser.add_argument("--is_backpack_vl", type=str, default="False")
     parser.add_argument("--is_shoulder_bag_vl", type=str, default="False")
     parser.add_argument("--is_hand_carried_vl", type=str, default="False")
@@ -36,7 +37,7 @@ if __name__ == '__main__':
             batch_size=batch_size,
             max_workers=max_workers,
         )
-        exit()
+        
 
     if get_arg_bool(args.drn):
         from mxx.annot.utils.annot_drn import annot_drn
@@ -48,7 +49,7 @@ if __name__ == '__main__':
             batch_size=batch_size,
             max_workers=max_workers,
         )
-        exit()
+        
 
     if get_arg_bool(args.is_visible):
         from mxx.annot.utils.annot_is_visible import annot_is_visible
@@ -60,7 +61,19 @@ if __name__ == '__main__':
             batch_size=batch_size,
             max_workers=max_workers,
         )
-        exit()
+        
+
+    if get_arg_bool(args.is_riding_vl):
+        from mxx.annot.utils.annot_vl import annot_vl
+        process_reid_batch_vl(
+            path_cfg=path_cfg,
+            keys_text=[],
+            name_processing="annoting is_riding_vl",
+            method_batch=annot_vl,
+            batch_size=batch_size,
+            idx_annot="is_riding_vl",
+        )
+        
 
     if get_arg_bool(args.is_backpack_vl):
         from mxx.annot.utils.annot_vl import annot_vl
@@ -72,7 +85,7 @@ if __name__ == '__main__':
             batch_size=batch_size,
             idx_annot="is_backpack_vl",
         )
-        exit()
+        
 
     if get_arg_bool(args.is_shoulder_bag_vl):
         from mxx.annot.utils.annot_vl import annot_vl
@@ -84,7 +97,7 @@ if __name__ == '__main__':
             batch_size=batch_size,
             idx_annot="is_shoulder_bag_vl",
         )
-        exit()
+        
 
     if get_arg_bool(args.is_hand_carried_vl):
         from mxx.annot.utils.annot_vl import annot_vl
@@ -96,7 +109,7 @@ if __name__ == '__main__':
             batch_size=batch_size,
             idx_annot="is_hand_carried_vl",
         )
-        exit()
+        
 
     if get_arg_bool(args.upper_vl):
         from mxx.annot.utils.annot_vl import annot_vl
@@ -108,7 +121,7 @@ if __name__ == '__main__':
             batch_size=batch_size,
             idx_annot="upper_vl",
         )
-        exit()
+        
 
     if get_arg_bool(args.color_upper_vl):
         from mxx.annot.utils.annot_vl import annot_vl
@@ -120,7 +133,7 @@ if __name__ == '__main__':
             batch_size=batch_size,
             idx_annot="color_upper_vl",
         )
-        exit()
+        
 
     if get_arg_bool(args.bottoms_vl):
         from mxx.annot.utils.annot_vl import annot_vl
@@ -132,7 +145,7 @@ if __name__ == '__main__':
             batch_size=batch_size,
             idx_annot="bottoms_vl",
         )
-        exit()
+        
 
     if get_arg_bool(args.color_bottoms_vl):
         from mxx.annot.utils.annot_vl import annot_vl
@@ -144,4 +157,4 @@ if __name__ == '__main__':
             batch_size=batch_size,
             idx_annot="color_bottoms_vl",
         )
-        exit()
+        

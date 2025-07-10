@@ -46,17 +46,21 @@ A brief phrase is enough, no full sentences."
 
     prompts["is_shoulder_bag_vl"] = "Could you please describe \
 is the person in the photo carrying a shoulder bag?\
-please anwser with a brief phrase 'yes' or 'no'"
+please anwser with a brief phrase 'yes' or 'no', no full sentences."
 
     prompts["is_backpack_vl"] = "Could you please describe \
 is the person in the photo wearing a backpack?\
-please anwser with a brief phrase 'yes' or 'no'"
+please anwser with a brief phrase 'yes' or 'no', no full sentences."
+
+    prompts["is_riding_vl"] = "Could you please describe \
+is the person in the photo riding?\
+please anwser with a brief phrase 'yes' or 'no', no full sentences."
     
     prompts["is_hand_carried_vl"] = "Could you please describe \
 is the person in the photo carrying some object in his or her hand?\
 Attention that only the object carried on his hand,\
 the backpack and shoulder bag not count!\
-please anwser with a brief phrase 'yes' or 'no'"
+please anwser with a brief phrase 'yes' or 'no', no full sentences."
 
     return prompts
 
