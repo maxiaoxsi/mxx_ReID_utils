@@ -157,6 +157,9 @@ class Cache:
                     basename = f"{id_p}{id_v}F{str(i).zfill(3)}"
                     path_reid = get_path(self._dir, id_p, basename, ext, "reid")
                     if not os.path.exists(path_reid):
+                        print(path_reid)
+                        print(vid['n_frame'])
+                        print(i)
                         vid['n_frame'] = i - 1
                         vid['frame_without_smplx'] = [item for item in vid['frame_without_smplx'] if item < i]
                         break

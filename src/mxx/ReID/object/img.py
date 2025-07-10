@@ -59,6 +59,7 @@ class Img:
 
         path = get_path(self.dir, self.dir_sub, self.basename, self.ext, key)
         if not os.path.exists(path):
+            print(path)
             raise Exception("path not exists")
         
         return Image.open(path)
