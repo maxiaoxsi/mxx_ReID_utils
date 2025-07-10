@@ -58,7 +58,6 @@ class Img:
                 return img_fore
 
         path = get_path(self.dir, self.dir_sub, self.basename, self.ext, key)
-        print(path)
         if not os.path.exists(path):
             raise Exception("path not exists")
         
