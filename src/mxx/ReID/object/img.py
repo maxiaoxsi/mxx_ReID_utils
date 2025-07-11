@@ -48,6 +48,8 @@ class Img:
         if key in ['mask', 'background', 'foreground']:
             path_reid = get_path(self.dir, self.dir_sub, self.basename, self.ext, "reid")
             path_manikin = get_path(self.dir, self.dir_sub, self.basename, self.ext, "manikin")
+            if not os.path.exists(path_manikin):
+                return None
             from ...utils.mask import make_mask
             img_mask, img_fore, img_back = make_mask(path_manikin=path_manikin, path_reid=path_reid)
             if key == "mask":
@@ -59,6 +61,8 @@ class Img:
 
         path = get_path(self.dir, self.dir_sub, self.basename, self.ext, key)
         if not os.path.exists(path):
+            if key in ["manikin", "skeleton"]:
+                return None
             print(path)
             raise Exception("path not exists")
         

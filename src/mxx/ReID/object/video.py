@@ -10,14 +10,9 @@ class Video:
         self._logger = logger
         self._dir_sub = cache["dir_sub"]
         self._n_frame = cache["n_frame"]
+        self._frame_with_smplx_list = cache["frame_with_smplx"]
         self._frame_without_smplx_list = cache["frame_without_smplx"]
-        self._frame_with_smplx_list = []
-        for i in range(1, self.n_frame + 1):
-            if i not in self._frame_without_smplx_list:
-                self._frame_with_smplx_list.append(i)
-        self._img_list = []
-        for i in range(self._n_frame):
-            self._img_list.append(None)
+        self._img_list = [None for i in range(self._n_frame)]
 
     def __getitem__(self, idx):
         idx = idx - 1
@@ -25,7 +20,7 @@ class Video:
         if self._img_list[idx] is None:
             cache = {
                 "dir_sub":self.dir_sub,
-                "is_smplx":(idx + 1) in self._frame_without_smplx_list,
+                "is_smplx":(idx + 1) not in self._frame_without_smplx_list,
             }
             img = Img(
                 basename=self.get_basename(idx + 1),
@@ -40,15 +35,16 @@ class Video:
         return img
 
     def get_img_tgt_list(self, n_frame, stage):
-        if n_frame < 2:
-            n_frame = 2
-        if n_frame > self.n_frame:
-            idx_st = 1
-        else:
-            idx_st = random.randint(1, (self.n_frame - n_frame + 1))
+        idx_st = self._frame_with_smplx_list[0]
+        idx_ed = self._frame_with_smplx_list[-1]
+        len_frame = idx_ed - idx_st + 1
+        if len_frame > n_frame:
+            idx_st = random.randint(idx_st, idx_st + len_frame - n_frame)
+            while idx_st in self._frame_without_smplx_list:
+                idx_st = idx_st - 1
         img_tgt_list = []
         for i in range(idx_st, idx_st + n_frame):
-            img_tgt_list.append(self[i] if i < self.n_frame else self[self.n_frame])
+            img_tgt_list.append(self[i] if i <= idx_ed else self[idx_ed])
         return img_tgt_list
     
     @property

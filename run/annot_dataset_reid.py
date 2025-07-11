@@ -9,6 +9,7 @@ if __name__ == '__main__':
     parser.add_argument("--path_cfg", type=str, default="/machangxiao/code/MIP-ReID/configs/datasets/MARS-v160809/cfg_cache_mars_train.yaml")
     parser.add_argument("--batch_size", type=int, default=128)
     parser.add_argument("--max_workers", type=int, default=8)
+    parser.add_argument("--is_width", type=str, default="False")
     parser.add_argument("--is_smplx", type=str, default="False")
     parser.add_argument("--drn", type=str, default="False")
     parser.add_argument("--is_visible", type=str, default="False")
@@ -26,6 +27,17 @@ if __name__ == '__main__':
     path_cfg = args.path_cfg
     batch_size = args.batch_size
     max_workers = args.max_workers
+
+    if get_arg_bool(args.is_width):
+        from mxx.annot.utils.annot_width import annot_width
+        print("annot width start!")
+        process_reid_batch(
+            path_cfg=path_cfg,
+            name_processing="annoting width",
+            method=annot_width,
+            batch_size=batch_size,
+            max_workers=max_workers,
+        )
 
     if get_arg_bool(args.is_smplx):
         from mxx.annot.utils.annot_is_smplx import annot_is_smplx

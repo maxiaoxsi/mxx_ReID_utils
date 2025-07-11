@@ -12,12 +12,15 @@ def add_vid(person, dir_sub, id_vid, id_frame, is_smplx):
         video = {
             'dir_sub': dir_sub,
             'n_frame': int(id_frame),
+            'frame_with_smplx': [],
             'frame_without_smplx': [],
         }
         person[id_vid] = video
     if int(id_frame) > video['n_frame']:
         video['n_frame'] = int(id_frame)
-    if not is_smplx:
+    if is_smplx:
+        video['frame_with_smplx'].append(int(id_frame))
+    else:
         video['frame_without_smplx'].append(int(id_frame))
 
 
@@ -141,8 +144,10 @@ class Cache:
                 is_smplx = annot.get_annot('is_smplx')
                 if is_smplx in ['True', True]:
                     is_smplx = True
-                else:
+                elif is_smplx in ['False', False]:
                     is_smplx = False
+                else:
+                    self._logger(f'[cache] is_smplx key wrong!')
                 add_person_vid(person_dict, id_person, dir_sub, id_vid, id_frame, is_smplx)
         self._cache['type'] = 'vid'
         self._cache['ext'] = ext
@@ -150,7 +155,9 @@ class Cache:
 
     def _check_cache_vid(self):
         ext = self._cache['ext']
+        cache = {}
         for id_p, person in self._cache['person'].items():
+            person_new = {}
             for id_v, vid in person.items():
                 n_frame = vid['n_frame']
                 for i in range(1, n_frame + 1):
@@ -161,8 +168,16 @@ class Cache:
                         print(vid['n_frame'])
                         print(i)
                         vid['n_frame'] = i - 1
+                        vid['frame_with_smplx'] = [item for item in vid['frame_with_smplx'] if item < i]
                         vid['frame_without_smplx'] = [item for item in vid['frame_without_smplx'] if item < i]
                         break
+                if len(vid['frame_with_smplx']) > 0:
+                    person_new[id_v] = vid
+                else:
+                    print(f"{id_v} all frame without smplx")
+            if len(person_new) > 0:
+                cache[id_p] = person_new
+        self._cache['person'] = cache
 
     @property
     def type(self):

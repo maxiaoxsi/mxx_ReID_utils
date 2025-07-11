@@ -90,7 +90,7 @@ def save_dscrpt_list(dscrpt_list, dir_base, dir_sub, is_clean=True):
                 sort_keys=False 
             )
 
-def save_img_pil(img_pil_list, dscrpt_list, dir_base, dir_sub, is_clean=True):
+def save_img_pil(img_pil_list, dscrpt_list, dir_base, dir_sub, is_clean=False):
     dir_save = os.path.join(dir_base, dir_sub)
     if not os.path.exists(dir_save):
         os.makedirs(dir_save)
