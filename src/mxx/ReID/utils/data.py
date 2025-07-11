@@ -46,6 +46,7 @@ def save_sample(sample, dir_base, is_norm):
             img_tgt_tensor = sample['img_tgt_tensor']
         img_manikin_tensor = sample['img_manikin_tensor']
         img_skeleton_tensor = sample['img_skeleton_tensor']
+        img_rgbguid_tensor = sample['img_rgbguid_tensor']
         img_background_tensor = sample['img_background_tensor']
         text_ref_list = sample['text_ref_list']
         text_tgt_list = sample['text_tgt_list']
@@ -56,6 +57,7 @@ def save_sample(sample, dir_base, is_norm):
         save_img_tensor(img_ref_tensor, dir_base, "ref", True, is_norm)
         save_img_tensor(img_manikin_tensor, dir_base, "manikin", True, is_norm)
         save_img_tensor(img_skeleton_tensor, dir_base, "skeleton", True, is_norm)
+        save_img_tensor(img_rgbguid_tensor, dir_base, "rgbguid", True, is_norm)
         save_img_tensor(img_background_tensor, dir_base, "background", True, is_norm)
         save_text_list(text_ref_list, dir_base, 'ref', False)
         if 'img_tgt_tensor' not in sample:

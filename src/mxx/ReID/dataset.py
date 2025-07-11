@@ -123,19 +123,25 @@ class ReIDDataset(Dataset):
             img_pil_list=sample['img_manikin_pil_list'], 
             type_transforms="manikin", 
             seed=seed, 
-            img_size=self._img_size
+            img_size=self._img_size,
         )
         img_skeleton_tensor_list = self.get_img_tensor_list(
             img_pil_list=sample['img_skeleton_pil_list'], 
             type_transforms="skeleton", 
             seed=seed, 
-            img_size=self._img_size
+            img_size=self._img_size,
+        )
+        img_rgbguid_tensor_list = self.get_img_tensor_list(
+            img_pil_list=sample['img_rgbguid_pil_list'],
+            type_transforms="rgbguid",
+            seed=seed,
+            img_size=self._img_size,
         )
         img_background_tensor_list = self.get_img_tensor_list(
             img_pil_list=sample['img_background_pil_list'], 
             type_transforms="background", 
             seed=seed, 
-            img_size=self._img_size
+            img_size=self._img_size,
         )
 
         (
@@ -156,6 +162,10 @@ class ReIDDataset(Dataset):
             rate=self._rate_dropout_skeleton, 
             args_img=(img_skeleton_tensor_list, ),
         )
+        (img_rgbguid_tensor, ) = self._get_img_tensor(
+            rate=self._rate_dropout_rgbguid,
+            args_img=(img_rgbguid_tensor_list, ),
+        )
         (img_background_tensor, ) = self._get_img_tensor(
             rate=self._rate_dropout_back,
             args_img=(img_background_tensor_list, ),
@@ -167,6 +177,7 @@ class ReIDDataset(Dataset):
             "img_tgt_tensor": img_tgt_tensor,
             'img_manikin_tensor': img_manikin_tensor,
             'img_skeleton_tensor': img_skeleton_tensor,
+            'img_rgbguid_tensor': img_rgbguid_tensor,
             "img_background_tensor": img_background_tensor,
             'text_ref_list': sample['text_ref_list'],
             'text_tgt_list': sample['text_tgt_list'],
@@ -180,7 +191,7 @@ class ReIDDataset(Dataset):
         return tuple(torch.stack(item, dim=0) for item in args_img)
 
     def get_img_tensor_list(self, img_pil_list, type_transforms, img_size, seed = None):
-        if type_transforms in ["ref", "tgt", "background", "manikin", "skeleton"]:
+        if type_transforms in ["ref", "tgt", "background", "manikin", "skeleton", "rgbguid"]:
             transforms_img=self._transforms_aug_norm_pad
         elif type_transforms == "reid":
             transforms_img=self._transforms_reid

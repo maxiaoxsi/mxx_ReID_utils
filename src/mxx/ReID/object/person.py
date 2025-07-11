@@ -53,6 +53,7 @@ class Person:
         img_tgt_pil_list = get_img_pil_list(img_tgt_list, "reid")
         img_manikin_pil_list = get_img_pil_list(img_tgt_list, "manikin")
         img_skeleton_pil_list = get_img_pil_list(img_tgt_list, "skeleton")
+        img_rgbguid_pil_list = get_img_pil_list(img_tgt_list, "rgbguid")
         img_mask_pil_list = get_img_pil_list(img_tgt_list, "mask")
         img_foreground_pil_list = get_img_pil_list(img_tgt_list, "foreground")
         img_background_pil_list = get_img_pil_list(img_tgt_list, "background", rate_mask_aug)
@@ -68,6 +69,7 @@ class Person:
             'img_tgt_pil_list':img_tgt_pil_list,
             'img_manikin_pil_list':img_manikin_pil_list,
             'img_skeleton_pil_list':img_skeleton_pil_list,
+            'img_rgbguid_pil_list':img_rgbguid_pil_list,
             'img_mask_pil_list':img_mask_pil_list,
             'img_foreground_pil_list':img_foreground_pil_list,
             'img_background_pil_list':img_background_pil_list,
