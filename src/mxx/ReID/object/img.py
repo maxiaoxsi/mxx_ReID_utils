@@ -43,7 +43,7 @@ class Img:
     def __contains__(self, idx):
         return idx in self._annot
 
-    def get_img_pil(self, key):
+    def get_img_pil(self, key, rate_mask_aug):
         """Return the image as a PIL Image object."""
         if key in ['mask', 'background', 'foreground']:
             path_reid = get_path(self.dir, self.dir_sub, self.basename, self.ext, "reid")
@@ -51,7 +51,7 @@ class Img:
             if not os.path.exists(path_manikin):
                 return None
             from ...utils.mask import make_mask
-            img_mask, img_fore, img_back = make_mask(path_manikin=path_manikin, path_reid=path_reid)
+            img_mask, img_fore, img_back = make_mask(path_manikin=path_manikin, path_reid=path_reid, rate_mask_aug=rate_mask_aug)
             if key == "mask":
                 return img_mask
             if key == "background":

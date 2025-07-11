@@ -30,8 +30,10 @@ class ReIDDataset(Dataset):
         is_select_bernl=True,
         rate_dropout_ref=0.2,
         rate_dropout_back=0.2,
-        rate_dropout_smplx=0.2,
-        rate_back = 1,
+        rate_dropout_manikin=0,
+        rate_dropout_skeleton=0.2,
+        rate_dropout_rgbguid=1,
+        rate_mask_aug = 1,
         width_scale=(1, 1),
         height_scale=(1, 1),
         img_size=(512, 512),
@@ -44,8 +46,10 @@ class ReIDDataset(Dataset):
         self._is_select_bernl = is_select_bernl
         self._rate_dropout_ref = rate_dropout_ref
         self._rate_dropout_back = rate_dropout_back
-        self._rate_dropout_smplx = rate_dropout_smplx
-        self._rate_back = rate_back
+        self._rate_dropout_manikin = rate_dropout_manikin
+        self._rate_dropout_skeleton = rate_dropout_skeleton
+        self._rate_dropout_rgbguid = rate_dropout_rgbguid
+        self._rate_mask_aug = rate_mask_aug
         self._logger = Logger(path_log=path_log)
         
         cfg = load_cfg(path_cfg)
@@ -93,7 +97,7 @@ class ReIDDataset(Dataset):
             n_frame=self.n_frame,
             stage=self.stage,
             is_select_bernl = self.is_select_bernl,
-            rate_back = self.rate_back
+            rate_mask_aug = self.rate_mask_aug
         )
         seed = int(time.time())
         img_ref_tensor_list = self.get_img_tensor_list(
@@ -141,9 +145,17 @@ class ReIDDataset(Dataset):
             rate=self._rate_dropout_ref,
             args_img=(img_ref_tensor_list, img_reid_tensor_list)
         )
-        (img_tgt_tensor, ) = self._get_img_tensor(None, (img_tgt_tensor_list, ))
-        (img_manikin_tensor, ) = self._get_img_tensor(None, (img_manikin_tensor_list, ))
-        (img_skeleton_tensor, ) = self._get_img_tensor(None, (img_skeleton_tensor_list, ))
+        (img_tgt_tensor, ) = self._get_img_tensor(
+            rate=None, 
+            args_img=(img_tgt_tensor_list, ))
+        (img_manikin_tensor, ) = self._get_img_tensor(
+            rate=self._rate_dropout_manikin, 
+            args_img=(img_manikin_tensor_list, ),
+        )
+        (img_skeleton_tensor, ) = self._get_img_tensor(
+            rate=self._rate_dropout_skeleton, 
+            args_img=(img_skeleton_tensor_list, ),
+        )
         (img_background_tensor, ) = self._get_img_tensor(
             rate=self._rate_dropout_back,
             args_img=(img_background_tensor_list, ),
@@ -309,8 +321,8 @@ class ReIDDataset(Dataset):
         return self._is_select_bernl
 
     @property
-    def rate_back(self):
-        return self._rate_back
+    def rate_mask_aug(self):
+        return self._rate_mask_aug
 
     def load_sample_from_dir(self, dir_sample, path_manikin=None, path_skeleton=None):
         samples = {}

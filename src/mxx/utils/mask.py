@@ -5,7 +5,7 @@ import os
 import errno
 from ..ReID.utils.path import get_dir_sub, get_path, get_basename
 
-def make_mask(path_reid, path_manikin):
+def make_mask(path_reid, path_manikin, rate_mask_aug):
     img = Image.open(path_manikin).convert('L')
     arr = np.array(img)
     h, w = arr.shape
@@ -24,7 +24,10 @@ def make_mask(path_reid, path_manikin):
             if np.any(block > 10):
                 cache.append((start_i, end_i, start_j, end_j))
             else:
-                arr[start_i:end_i, start_j:end_j] = 0
+                if random.random() < rate_mask_aug:
+                    cache.append((start_i, end_i, start_j, end_j))
+                else:
+                    arr[start_i:end_i, start_j:end_j] = 0
     for (start_i, end_i, start_j, end_j) in cache:
         arr[start_i:end_i, start_j:end_j] = 1
         

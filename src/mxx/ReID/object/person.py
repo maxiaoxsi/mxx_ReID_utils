@@ -29,7 +29,7 @@ class Person:
             self._img_set.add_item(basename, img)
         del self._cache
 
-    def get_sample(self, idx_vid, idx_img, n_frame, stage, is_select_bernl, rate_back):
+    def get_sample(self, idx_vid, idx_img, n_frame, stage, is_select_bernl, rate_mask_aug):
         """Get a sample from the person's imgSet or videoSet"""
         """stage1: img, text: visible infrared"""
         """stage2: video"""
@@ -55,7 +55,7 @@ class Person:
         img_skeleton_pil_list = get_img_pil_list(img_tgt_list, "skeleton")
         img_mask_pil_list = get_img_pil_list(img_tgt_list, "mask")
         img_foreground_pil_list = get_img_pil_list(img_tgt_list, "foreground")
-        img_background_pil_list = get_img_pil_list(img_tgt_list, "background")
+        img_background_pil_list = get_img_pil_list(img_tgt_list, "background", rate_mask_aug)
         
         text_ref = img_tgt_list[0].get_text_ref()
         text_tgt = img_tgt_list[0].get_text_tgt()
