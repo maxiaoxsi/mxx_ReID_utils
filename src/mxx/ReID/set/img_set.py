@@ -93,7 +93,8 @@ class ImgSet(SetBase):
                 if img_ref is not None:
                     break
             img_ref_list.append(img_ref)
-            random.shuffle(img_ref_list)
+            if random.random() < 0.3:
+                random.shuffle(img_ref_list)
         return img_ref_list, img_sorted_list_drns
 
     def get_img_sorted_list(self, annot_tgt, drn):

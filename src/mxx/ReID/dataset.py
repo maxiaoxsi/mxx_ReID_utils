@@ -104,6 +104,7 @@ class ReIDDataset(Dataset):
             img_pil_list=sample['img_ref_pil_list'], 
             type_transforms="ref", 
             img_size=self._img_size,
+            is_train=True,
             seed=seed, 
         )
         img_reid_tensor_list = self.get_img_tensor_list(
@@ -190,9 +191,13 @@ class ReIDDataset(Dataset):
                     img_tensor_list[i] = torch.zeros_like(img_tensor_list[i])
         return tuple(torch.stack(item, dim=0) for item in args_img)
 
-    def get_img_tensor_list(self, img_pil_list, type_transforms, img_size, seed = None):
+    def get_img_tensor_list(self, img_pil_list, type_transforms, 
+            img_size, is_train=False, seed = None):
         if type_transforms in ["ref", "tgt", "background", "manikin", "skeleton", "rgbguid"]:
-            transforms_img=self._transforms_aug_norm_pad
+            if is_train and type_transforms == "ref":
+                transforms_img=self._transforms_ref
+            else:
+                transforms_img=self._transforms_aug_norm_pad
         elif type_transforms == "reid":
             transforms_img=self._transforms_reid
         else:
@@ -272,6 +277,7 @@ class ReIDDataset(Dataset):
                 img_padded = F.pad(img, padding, fill=self.fill)
                 return img_padded
 
+
         self._transforms_aug_norm_pad = transforms.Compose(
             [
                 RandomCrop(width_scale, height_scale),
@@ -282,21 +288,31 @@ class ReIDDataset(Dataset):
             ]
         )
 
-        self._transforms_aug_pad = transforms.Compose(
+        self._transforms_ref = transforms.Compose(
             [
                 RandomCrop(width_scale, height_scale),
                 Scale1D(self._img_size[0]),
                 transforms.ToTensor(),
+                transforms.Normalize(mean=[0.5], std=[0.5]),
+                transforms.RandomErasing(p=0.5, scale=(0.02, 0.23), ratio=(0.3, 3.3), value=0, inplace=False),
                 PadToBottomRight(target_size=self._img_size, fill=0),
             ]
         )
+
+        # self._transforms_aug_pad = transforms.Compose(
+        #     [
+        #         RandomCrop(width_scale, height_scale),
+        #         Scale1D(self._img_size[0]),
+        #         transforms.ToTensor(),
+        #         PadToBottomRight(target_size=self._img_size, fill=0),
+        #     ]
+        # )
 
         self._transforms_reid=transforms.Compose(
             [
                 Scale2D(128, 256),
                 transforms.ToTensor(),
                 transforms.Normalize(mean=[0.5],std=[0.5]),
-                # transforms.Normalize(mean=[0.485, 0.456, 0.406],std=[0.229, 0.224, 0.225]),
             ]
         )
 
@@ -335,7 +351,7 @@ class ReIDDataset(Dataset):
     def rate_mask_aug(self):
         return self._rate_mask_aug
 
-    def load_sample_from_dir(self, dir_sample, path_manikin=None, path_skeleton=None):
+    def load_sample_from_dir(self, dir_sample):
         samples = {}
         for dir in os.listdir(dir_sample):
             dir_person = os.path.join(dir_sample, dir)
@@ -367,6 +383,11 @@ class ReIDDataset(Dataset):
                 type_transforms="skeleton",
                 img_size=self._img_size,
             )
+            img_rgbguid_tensor = self.load_img_from_dir(
+                dir_person=dir_person,
+                type_transforms="rgbguid",
+                img_size=self._img_size,
+            )
             text_ref_list = self.load_text_from_dir(
                 dir_person=dir_person,
                 type_list = "reid",
@@ -380,6 +401,7 @@ class ReIDDataset(Dataset):
                 "img_reid_tensor": img_reid_tensor,
                 'img_manikin_tensor': img_manikin_tensor,
                 'img_skeleton_tensor': img_skeleton_tensor,
+                "img_rgbguid_tensor": img_rgbguid_tensor,
                 "img_background_tensor": img_background_tensor,
                 'text_ref_list': text_ref_list,
                 'text_tgt_list': text_tgt_list,

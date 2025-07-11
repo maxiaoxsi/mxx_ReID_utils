@@ -58,11 +58,9 @@ class Img:
                 return img_back
             elif key == "foreground":
                 return img_fore
-        if key == "rgbguid":
-            key = "gen"
         path = get_path(self.dir, self.dir_sub, self.basename, self.ext, key)
         if not os.path.exists(path):
-            if key in ["manikin", "skeleton", "gen"]:
+            if key in ["manikin", "skeleton", "rgbguid"]:
                 return None
             print(path)
             raise Exception("path not exists")

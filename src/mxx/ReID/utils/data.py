@@ -14,12 +14,13 @@ def save_item(dataset, id_person, idx_vid, idx_img, dir_base, is_select_bernl, r
         n_frame=dataset.n_frame,
         stage=dataset.stage,
         is_select_bernl = is_select_bernl,
-        rate_back=rate_back,
+        rate_mask_aug=0,
     )
     img_ref_pil_list = sample["img_ref_pil_list"]
     img_tgt_pil_list = sample["img_tgt_pil_list"]
     img_manikin_pil_list = sample["img_manikin_pil_list"]
     img_skeleton_pil_list = sample["img_skeleton_pil_list"]
+    img_rgbguid_pil_list = sample["img_rgbguid_pil_list"]
     img_mask_pil_list = sample["img_mask_pil_list"]
     img_foreground_pil_list = sample["img_foreground_pil_list"]
     img_background_pil_list = sample["img_background_pil_list"]
@@ -31,6 +32,7 @@ def save_item(dataset, id_person, idx_vid, idx_img, dir_base, is_select_bernl, r
     save_img_pil(img_tgt_pil_list, annot_tgt_list, dir_base, "tgt")
     save_img_pil(img_manikin_pil_list, annot_tgt_list, dir_base, "manikin")
     save_img_pil(img_skeleton_pil_list, annot_tgt_list, dir_base, "skeleton")
+    save_img_pil(img_rgbguid_pil_list, annot_tgt_list, dir_base, "rgbguid")
     save_img_pil(img_mask_pil_list, annot_tgt_list, dir_base, "mask")
     save_img_pil(img_background_pil_list, annot_tgt_list, dir_base, "background")
     save_img_pil(img_foreground_pil_list, annot_tgt_list, dir_base, "foreground")
