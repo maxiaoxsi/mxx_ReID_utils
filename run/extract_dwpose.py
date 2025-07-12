@@ -1,5 +1,4 @@
 import argparse
-from mxx.dwpose import DWposeDetector
 from mxx.utils.batch import process_reid_batch
 
 from PIL import Image

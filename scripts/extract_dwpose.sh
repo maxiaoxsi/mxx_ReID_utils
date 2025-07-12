@@ -6,6 +6,6 @@ PATH_MARKET_TEST=/machangxiao/code/MIP-ReID/configs/datasets/Market-1501-v15.09.
 
 
 python run/extract_dwpose.py \
-    --path_cfg $PATH_DUKE_TRAIN \
-    --batch_size 256 \
+    --path_cfg $PATH_MARS_TRAIN \
+    --batch_size 128 \
     --max_workers 8

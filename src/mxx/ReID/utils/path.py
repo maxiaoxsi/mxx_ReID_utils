@@ -23,7 +23,7 @@ def get_dir_base(key, dir_base):
     if isinstance(dir_base, dict):
         if "dir" in dir_base:
             dir_base = dir_base["dir"]
-        if key in ["skeleton", "pred", "manikin"]:
+        if key in ["pred", "manikin"]:
             key = "smplx"
         if key in dir_base:
             dir_base = dir_base[key]
@@ -36,7 +36,7 @@ def get_dir_base(key, dir_base):
         raise Exception("can't get basename")
 
 def get_dir_ext(key):
-    if key in ["skeleton", "manikin", "pred"]:
+    if key in ["manikin", "pred"]:
         return key
     else:
         return ""

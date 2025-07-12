@@ -127,7 +127,9 @@ def extract_dwpose(args):
     dir_sub = get_dir_sub(root, cfg)
     basename, ext = get_basename(name_file=file)
     path_reid = get_path(cfg, dir_sub, basename, ext, "reid")
-    path_skeleton_dw = get_path(cfg, dir_sub, basename, ext, "skeleton_dw")
+    path_skeleton = get_path(cfg, dir_sub, basename, ext, "skeleton")
+    if os.path.exists(path_skeleton):
+        return
     global detector
     if detector is None:
         detector = DWposeDetector()
@@ -135,4 +137,7 @@ def extract_dwpose(args):
     img_pil = Image.open(path_reid)
     result, score = detector(img_pil, detect_resolution=128)
     img_tgt = result.resize(img_pil.size)
-    img_tgt.save(path_skeleton_dw)
+    dir_skeleton = os.path.dirname(path_skeleton)
+    if not os.path.exists(dir_skeleton):
+        os.makedirs(dir_skeleton, exist_ok=True)
+    img_tgt.save(path_skeleton)

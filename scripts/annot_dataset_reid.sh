@@ -11,17 +11,17 @@ python run/annot_dataset_reid.py \
     --path_cfg $PATH_MARKET_TEST \
     --batch_size 256 \
     --max_workers 8 \
-    --is_width False \
-    --is_smplx False \
-    --drn False \
-    --is_visible False \
+    --is_width True \
+    --is_smplx True \
+    --drn True \
+    --is_visible True \
     --is_riding_vl True \
     --is_backpack_vl True \
     --is_shoulder_bag_vl True \
     --is_hand_carried_vl True \
     --upper_vl True \
     --color_upper_vl True \
-    --style_upper_vl False \
+    --style_upper_vl True \
     --bottoms_vl True \
     --color_bottoms_vl True \
-    --style_bottoms_vl False 
+    --style_bottoms_vl True 
