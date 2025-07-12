@@ -28,6 +28,7 @@ class ReIDDataset(Dataset):
         path_log="./log.txt",
         is_save=True,
         is_select_bernl=True,
+        rate_random_erase=0.5,
         rate_dropout_ref=0.2,
         rate_dropout_back=0.2,
         rate_dropout_manikin=0,
@@ -44,6 +45,7 @@ class ReIDDataset(Dataset):
         self._stage=stage
         self._n_frame = n_frame
         self._is_select_bernl = is_select_bernl
+        self._rate_random_erase = rate_random_erase
         self._rate_dropout_ref = rate_dropout_ref
         self._rate_dropout_back = rate_dropout_back
         self._rate_dropout_manikin = rate_dropout_manikin
@@ -294,7 +296,7 @@ class ReIDDataset(Dataset):
                 Scale1D(self._img_size[0]),
                 transforms.ToTensor(),
                 transforms.Normalize(mean=[0.5], std=[0.5]),
-                transforms.RandomErasing(p=0.5, scale=(0.02, 0.23), ratio=(0.3, 3.3), value=0, inplace=False),
+                transforms.RandomErasing(p=self._rate_random_erase, scale=(0.02, 0.23), ratio=(0.3, 3.3), value=0, inplace=False),
                 PadToBottomRight(target_size=self._img_size, fill=0),
             ]
         )

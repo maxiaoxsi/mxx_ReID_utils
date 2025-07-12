@@ -171,6 +171,7 @@ def load_samples(samples, bs):
         img_reid_tensor_list = []
         img_manikin_tensor_list = []
         img_skeleton_tensor_list = []
+        img_rgbguid_tensor_list = []
         img_background_tensor_list = []
         text_ref_list = []
         text_tgt_list = []
@@ -179,6 +180,7 @@ def load_samples(samples, bs):
             img_reid_tensor_list.append(sample['img_reid_tensor'])
             img_manikin_tensor_list.append(sample['img_manikin_tensor'])
             img_skeleton_tensor_list.append(sample['img_skeleton_tensor'])
+            img_rgbguid_tensor_list.append(sample['img_rgbguid_tensor'])
             img_background_tensor_list.append(sample['img_background_tensor'])
             for text_ref in sample['text_ref_list']:
                 text_ref_list.append(text_ref)
@@ -188,12 +190,14 @@ def load_samples(samples, bs):
         img_reid_tensor = torch.stack(img_reid_tensor_list, dim=0)
         img_manikin_tensor = torch.stack(img_manikin_tensor_list, dim=0)
         img_skeleton_tensor = torch.stack(img_skeleton_tensor_list, dim=0)
+        img_rgbguid_tensor = torch.stack(img_rgbguid_tensor_list, dim=0)
         img_background_tensor = torch.stack(img_background_tensor_list, dim=0)
         sample_batch = {
             'img_ref_tensor': img_ref_tensor,
             'img_reid_tensor': img_reid_tensor,
             'img_manikin_tensor': img_manikin_tensor,
             'img_skeleton_tensor': img_skeleton_tensor,
+            'img_rgbguid_tensor': img_rgbguid_tensor,
             'img_background_tensor': img_background_tensor,
             'text_ref_list': text_ref_list,
             'text_tgt_list': text_tgt_list

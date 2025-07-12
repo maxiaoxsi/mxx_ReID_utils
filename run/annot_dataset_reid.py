@@ -3,6 +3,15 @@ import argparse
 from mxx.utils.batch import process_reid_batch_vl, process_reid_batch
 from mxx.annot import get_arg_bool
 
+def extract_dwpose(path_cfg, batch_size, max_workers):
+    from mxx.smplx.utils.render import render_skeleton
+    process_reid_batch(
+        path_cfg=path_cfg,
+        name_processing="render skeleton",
+        method=render_skeleton,
+        batch_size=batch_size,
+        max_workers=max_workers,
+    )
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

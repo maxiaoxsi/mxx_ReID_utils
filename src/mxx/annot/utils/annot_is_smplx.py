@@ -8,6 +8,8 @@ def annot_is_smplx(args):
     (cfg, root, file, logger) = args
     if not check_is_file_img(file):
         return
+    if int(file.split("_")[0]) <= 0:
+        return
     dir_sub = get_dir_sub(root, cfg)
     basename, ext = get_basename(file)
     path_annot = get_path(cfg, dir_sub, basename, ext, "annot")

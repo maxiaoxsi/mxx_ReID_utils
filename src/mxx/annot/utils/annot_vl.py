@@ -9,6 +9,11 @@ def annot_vl(idx_annot, data_list, keys_text, cfg, logger):
     for (root, file) in data_list:
         dir_sub = get_dir_sub(root, cfg)
         basename, ext = get_basename(file) 
+        try:
+            if int(file.split("_")[0]) <= 0:
+                continue
+        except:
+            continue
         path_reid = get_path(cfg, dir_sub, basename, ext, "reid")
         path_annot = get_path(cfg, dir_sub, basename, ext, "annot")
         annot_temp = AnnotBase(path_annot=path_annot, logger=logger)

@@ -11,6 +11,8 @@ def render_skeleton(args):
     path_reid = get_path(cfg, dir_sub, basename, ext, "reid")
     path_pred = get_path(cfg, dir_sub, basename, ext, "pred")
     path_skeleton = get_path(cfg, dir_sub, basename, ext, "skeleton")
+    if int(basename.split('_')[0]) <= 0:
+        return
     if not os.path.exists(path_pred):
         return
     if os.path.exists(path_skeleton):
