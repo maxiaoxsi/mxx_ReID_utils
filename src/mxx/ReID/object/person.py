@@ -17,6 +17,8 @@ class Person:
         self._logger = logger
 
     def _load_cache(self):
+        if self._img_set is not None:
+            return
         self._img_set = ImgSet()
         for basename, cache_img in self._cache.items():
             img = Img(
@@ -29,13 +31,16 @@ class Person:
             self._img_set.add_item(basename, img)
         del self._cache
 
+    def __contains__(self, key):
+        self._load_cache()
+        return key in self._img_set
+
     def get_sample(self, idx_vid, idx_img, n_frame, stage, is_select_bernl, rate_mask_aug):
         """Get a sample from the person's imgSet or videoSet"""
         """stage1: img, text: visible infrared"""
         """stage2: video"""
         """stage3: infrared only"""
-        if self._img_set == None:
-            self._load_cache()
+        self._load_cache()
         
         (
             img_tgt_list,
@@ -114,8 +119,7 @@ class Person:
 
     @property
     def keys(self):
-        if self._img_set is None:
-            self._load_cache()
+        self._load_cache()
         return self._img_set.keys
 
 

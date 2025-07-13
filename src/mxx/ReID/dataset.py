@@ -88,6 +88,8 @@ class ReIDDataset(Dataset):
             idx_img=-1,
         )
    
+    def __contains__(self, key):
+        return key in self.keys
 
     def get_item(self, id_person, idx_vid, idx_img):
         person = self._person_set[id_person]

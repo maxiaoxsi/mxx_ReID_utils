@@ -67,38 +67,40 @@ class ImgSet(SetBase):
             img_sorted_list_drns[drn] = img_sorted_list
         for drn in ["front", "back", "left", "right"]:
             img_sorted_list = img_sorted_list_drns[drn]
-            if len(img_sorted_list) > 0:
-                img_standby = get_img_standby(img_ref_list, img_sorted_list)
-                if img_standby is not None:
-                    img_ref = None
-                    from ..utils.sample.sample import select_img_bernl
-                    for i in range(7): 
-                        img = select_img_bernl(img_sorted_list, is_select_bernl)
-                        if img not in img_ref_list:
-                            img_ref = img
-                            break
-                    if img_ref == None:
-                        img_ref = img_standby
-                    img_ref_list.append(img_ref)
-                    continue 
-            img_ref = None
-            for drn_sub in ["front", "left", "right", "back"]:
-                img_sorted_list = img_sorted_list_drns[drn_sub]
-                if len(img_sorted_list) == 0:
-                    continue
-                for img in img_sorted_list:
-                    if img not in img_ref_list:
-                        img_ref = img
-                        break
-                if img_ref is not None:
-                    break
+            # if len(img_sorted_list) > 0:
+            #     img_standby = get_img_standby(img_ref_list, img_sorted_list)
+            #     if img_standby is not None:
+            #         img_ref = None
+            #         from ..utils.sample.sample import select_img_bernl
+            #         for i in range(7): 
+            #             img = select_img_bernl(img_sorted_list, is_select_bernl)
+            #             if img not in img_ref_list:
+            #                 img_ref = img
+            #                 break
+            #         if img_ref == None:
+            #             img_ref = img_standby
+            #         img_ref_list.append(img_ref)
+            #         continue 
+            # img_ref = None
+            # for drn_sub in ["front", "left", "right", "back"]:
+            #     img_sorted_list = img_sorted_list_drns[drn_sub]
+            #     if len(img_sorted_list) == 0:
+            #         continue
+            #     for img in img_sorted_list:
+            #         if img not in img_ref_list:
+            #             img_ref = img
+            #             break
+            #     if img_ref is not None:
+            #         break
+            from ..utils.sample.sample import select_img_bernl
+            img_ref = select_img_bernl(img_sorted_list, is_select_bernl)
             img_ref_list.append(img_ref)
-            if random.random() < 0.3:
-                random.shuffle(img_ref_list)
+            
         return img_ref_list, img_sorted_list_drns
 
     def get_img_sorted_list(self, annot_tgt, drn):
         img_cond_list = self.get_list_cond(drn)
+        random.shuffle(img_cond_list)
         img_sorted_list = []
         for img in img_cond_list:
             img.calib_score(annot_tgt)
