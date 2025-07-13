@@ -22,6 +22,7 @@ class Img:
     ) -> None:
         self._basename = basename
         self._dir_sub = cache["dir_sub"]
+        self._is_smplx = cache["is_smplx"]
         self._dataset = dataset
         self._person = person
         self._logger = logger
