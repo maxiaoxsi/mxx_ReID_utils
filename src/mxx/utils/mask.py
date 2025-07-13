@@ -6,6 +6,9 @@ import errno
 from ..ReID.utils.path import get_dir_sub, get_path, get_basename
 
 def make_mask(path_reid, path_manikin, rate_mask_aug):
+    img_reid = Image.open(path_reid)
+    if not path_manikin or not os.path.exists(path_manikin):
+        return Image.new("L", img_reid.size, color=0), img_reid, Image.new("RGB", img_reid.size, color="black")
     img = Image.open(path_manikin).convert('L')
     arr = np.array(img)
     h, w = arr.shape
@@ -32,7 +35,6 @@ def make_mask(path_reid, path_manikin, rate_mask_aug):
         arr[start_i:end_i, start_j:end_j] = 1
         
     img_mask = Image.fromarray((arr > 0).astype(np.uint8) * 255)
-    img_reid = Image.open(path_reid)
     img_fore = Image.new("RGB", (w, h), (0, 0, 0))  # Black background
     img_back = Image.new("RGB", (w, h), (0, 0, 0))  # Black background
     pixel_reid = img_reid.load()

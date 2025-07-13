@@ -1,4 +1,4 @@
-def load_id_person(name_person, sub_dir):
+def load_id_person(name_person, sub_dir=None):
     return name_person.split('_')[0]
 
 def load_id_video(name_person):

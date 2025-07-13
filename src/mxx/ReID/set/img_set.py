@@ -32,8 +32,6 @@ class ImgSet(SetBase):
             'tgt': [],
         }
         for item in self._list:
-            if not item['is_smplx']:
-                continue
             self._list_cond['tgt'].append(item)
             if item['drn'] == 'left':
                 self._list_cond['left'].append(item)
