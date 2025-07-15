@@ -39,9 +39,9 @@ class Annotation(AnnotBase):
         if idx in self._key_str_list:
             return annot
         elif idx in self._key_bool_list:
-            if annot in ['yes', 'True', 'yes.']:
+            if annot in ['yes', 'True', 'yes.', True]:
                 return True
-            if annot in ['no', 'False', 'no.']:
+            if annot in ['no', 'False', 'no.', False]:
                 return False
             name_reid = self._img.basename
             self._logger.warning(f"{name_reid} __getitem__ bool key get other annot:{idx}, {annot}")
