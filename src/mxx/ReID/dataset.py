@@ -88,8 +88,6 @@ class ReIDDataset(Dataset):
             idx_img=-1,
         )
    
-    def __contains__(self, key):
-        return key in self.keys
 
     def get_item(self, id_person, idx_vid, idx_img):
         person = self._person_set[id_person]
@@ -303,6 +301,15 @@ class ReIDDataset(Dataset):
             ]
         )
 
+        # self._transforms_aug_pad = transforms.Compose(
+        #     [
+        #         RandomCrop(width_scale, height_scale),
+        #         Scale1D(self._img_size[0]),
+        #         transforms.ToTensor(),
+        #         PadToBottomRight(target_size=self._img_size, fill=0),
+        #     ]
+        # )
+
         self._transforms_reid=transforms.Compose(
             [
                 Scale2D(128, 256),
@@ -346,117 +353,8 @@ class ReIDDataset(Dataset):
     def rate_mask_aug(self):
         return self._rate_mask_aug
 
-    def load_sample_pil_from_dir(self, dir_person):
-        img_reid_pil_list = self.load_img_pil_from_dir(
-            dir_person=dir_person,
-            dir_sub="reid",
-            img_size=(128, 256),
-        )
-        img_ref_pil_list = self.load_img_pil_from_dir(
-            dir_person=dir_person,
-            dir_sub="reid",
-            img_size=self._img_size,
-        )
-        img_background_pil_list = self.load_img_pil_from_dir(
-            dir_person=dir_person,
-            dir_sub="background",
-            img_size=self._img_size,
-        )
-        img_manikin_pil_list = self.load_img_pil_from_dir(
-            dir_person=dir_person,
-            dir_sub="manikin",
-            img_size=self._img_size,
-        )
-        img_skeleton_pil_list = self.load_img_pil_from_dir(
-            dir_person=dir_person,
-            dir_sub="skeleton",
-            img_size=self._img_size,
-        )
-        img_rgbguid_pil_list = self.load_img_pil_from_dir(
-            dir_person=dir_person,
-            dir_sub="rgbguid",
-            img_size=self._img_size,
-        )
-        text_ref_list = self.load_text_from_dir(
-            dir_person=dir_person,
-            type_list = "reid",
-        )
-        text_tgt_list = self.load_text_from_dir(
-            dir_person=dir_person,
-            type_list = "tgt",
-        )
-        sample = {
-            "img_ref_pil_list": img_ref_pil_list,
-            "img_reid_pil_list": img_reid_pil_list,
-            'img_manikin_pil_list': img_manikin_pil_list,
-            'img_skeleton_pil_list': img_skeleton_pil_list,
-            "img_rgbguid_pil_list": img_rgbguid_pil_list,
-            "img_background_pil_list": img_background_pil_list,
-            'text_ref_list': text_ref_list,
-            'text_tgt_list': text_tgt_list,
-        }
-        return sample
-        
-    def load_samples_pil_dict_from_dir(self, dir_sample):
-        samples = {}
-        for dir in os.listdir(dir_sample):
-            dir_person = os.path.join(dir_sample, dir)
-            if not os.path.isdir(dir_person):
-                continue
-            sample = self.load_sample_pil_from_dir(dir_person)
-            samples[dir_person] = sample
-        return samples
-
-    def get_samples_tensor_dict(self, samples_pil_dict):
-        samples_tensor = {}
-        for key, sample in samples_pil_dict.items():
-            img_ref_tensor = self.get_img_tensor(
-                img_pil_list=sample["img_ref_pil_list"],
-                type_transforms="ref",
-                img_size=(512, 512),
-            )
-            img_reid_tensor = self.get_img_tensor(
-                img_pil_list=sample["img_reid_pil_list"],
-                type_transforms="reid",
-                img_size=(128, 256),
-            )
-            img_manikin_tensor = self.get_img_tensor(
-                img_pil_list=sample['img_manikin_pil_list'],
-                type_transforms="manikin",
-                img_size=(512, 512)
-            )
-            img_skeleton_tensor = self.get_img_tensor(
-                img_pil_list=sample['img_skeleton_pil_list'],
-                type_transforms="skeleton",
-                img_size=(512, 512)
-            )
-            img_rgbguid_tensor = self.get_img_tensor(
-                img_pil_list=sample['img_rgbguid_pil_list'],
-                type_transforms="rgbguid",
-                img_size=(512, 512)
-            )
-            img_background_tensor = self.get_img_tensor(
-                img_pil_list=sample['img_background_pil_list'],
-                type_transforms="background",
-                img_size=(512, 512)
-            )
-            sample = {
-                'img_ref_tensor': img_ref_tensor,
-                'img_reid_tensor': img_reid_tensor,
-                'img_manikin_tensor': img_manikin_tensor,
-                'img_skeleton_tensor': img_skeleton_tensor,
-                'img_rgbguid_tensor': img_rgbguid_tensor,
-                'img_background_tensor': img_background_tensor,
-                'text_ref_list': sample['text_ref_list'],
-                'text_tgt_list': sample['text_tgt_list'],
-            }
-            samples_tensor[key] = sample
-        return samples_tensor
-            
     def load_sample_from_dir(self, dir_sample):
         samples = {}
-        samples_pil = self.load_sample_pil_from_dir(dir_sample)
-        samples_tensor = self.get_samples_tensor_dict(samples_pil)
         for dir in os.listdir(dir_sample):
             dir_person = os.path.join(dir_sample, dir)
             if not os.path.isdir(dir_person):
@@ -513,38 +411,15 @@ class ReIDDataset(Dataset):
             samples[dir_person] = sample
         return samples
 
-    def load_img_tensor_from_pil(self, img_pil_list, type_transforms, img_size=(128, 256)):
-        img_tensor_list = self.get_img_tensor_list(
-            img_pil_list=img_pil_list, 
-            type_transforms=type_transforms, 
-            img_size=img_size,
-            seed=None,
-        )
-        img_tensor = torch.stack(img_tensor_list, dim=0)
-        return img_tensor
 
-    def load_img_tensor_from_path(self, path_list, type_transforms, img_size=(128, 256)):
-        img_pil_list = []
-        for path_img in path_list:
-            if not os.path.exists(path_img):
-                img_pil = None
-            else:
-                img_pil = Image.open(path_img)
-                if len(set(img_pil.getdata())) == 1:
-                    img_pil = None
-            img_pil_list.append(img_pil)
-        img_tensor_list = self.get_img_tensor_list(
-            img_pil_list=img_pil_list, 
-            type_transforms=type_transforms, 
-            img_size=img_size,
-            seed=None,
-        )
-        img_tensor = torch.stack(img_tensor_list, dim=0)
-        return img_tensor
 
-    def load_img_pil_from_dir(self, dir_person, dir_sub):
+    def load_img_from_dir(self, dir_person, type_transforms, img_size, type_img = None):
         img_pil_list = []
-        dir_img = os.path.join(dir_person, dir_sub)
+        if type_img is None:
+            dir_img = os.path.join(dir_person, type_transforms)
+        else:
+            dir_img = os.path.join(dir_person, type_img)
+        
         for path in os.listdir(dir_img):
             if not path.endswith((".jpg", ".png", ".jpeg")):
                 continue
@@ -553,9 +428,6 @@ class ReIDDataset(Dataset):
             if len(set(img_pil.getdata())) == 1:
                 img_pil = None
             img_pil_list.append(img_pil)
-        return img_pil_list
-
-    def get_img_tensor(self, img_pil_list, type_transforms, img_size):
         img_tensor_list = self.get_img_tensor_list(
             img_pil_list=img_pil_list, 
             type_transforms=type_transforms, 

@@ -14,8 +14,8 @@ class SetBase:
     def keys(self):
         return self._dict.keys()
 
-    def __contains__(self, key):
-        return key in self._dict
+    def __contains__(self, id_person):
+        return id_person in self._dict
 
     def add_item(self, key, item):
         self._list.append(item)
