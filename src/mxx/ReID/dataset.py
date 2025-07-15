@@ -298,7 +298,7 @@ class ReIDDataset(Dataset):
                 Scale1D(self._img_size[0]),
                 transforms.ToTensor(),
                 transforms.Normalize(mean=[0.5], std=[0.5]),
-                transforms.RandomErasing(p=self._rate_random_erase, scale=(0.02, 0.23), ratio=(0.3, 3.3), value=0, inplace=False),
+                transforms.RandomErasing(p=self._rate_random_erase, scale=(0.12, 0.37), ratio=(0.3, 3.3), value=0, inplace=False),
                 PadToBottomRight(target_size=self._img_size, fill=0),
             ]
         )
