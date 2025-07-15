@@ -30,11 +30,17 @@ src/mxx/ReID/viewer/viewer.py
 src/mxx/annot/__init__.py
 src/mxx/annot/annot_base.py
 src/mxx/annot/annot_keys.py
+src/mxx/dwpose/__init__.py
+src/mxx/dwpose/onnxdet.py
+src/mxx/dwpose/onnxpose.py
+src/mxx/dwpose/util.py
+src/mxx/dwpose/wholebody.py
 src/mxx/utils/__init__.py
 src/mxx/utils/batch.py
 src/mxx/utils/check.py
 src/mxx/utils/list.py
 src/mxx/utils/mask.py
 src/mxx/utils/path.py
+src/mxx/utils/process_dir.py
 src/mxx/utils/rename.py
 src/mxx/utils/sample.py

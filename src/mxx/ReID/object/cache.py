@@ -99,13 +99,18 @@ class Cache:
                 if not id_person.isdigit() or int(id_person) < id_person_min:
                     continue
                 path_annot = get_path(self._dir, dir_sub, basename, ext, "annot")
+                path_manikin = get_path(self._dir, dir_sub, basename, ext, "manikin")
                 from ...annot.annot_base import AnnotBase
                 annot = AnnotBase(path_annot=path_annot, logger=self._logger)
-                is_smplx = annot.get_annot('is_smplx')
-                if is_smplx in ['True', True]:
-                    is_smplx = True
+                if 'is_smplx' in annot:
+                    is_smplx = annot.get_annot('is_smplx')
+                    if is_smplx in ['True', True]:
+                        is_smplx = True
+                    else:
+                        is_smplx = False
                 else:
-                    is_smplx = False
+                    is_smplx = os.path.exists(path_manikin)
+                    annot.set_annot('is_smplx', is_smplx)
                 add_person_img(person_dict, id_person, dir_sub, basename, is_smplx)
         self._cache['type'] = 'img'
         self._cache['ext'] = ext
