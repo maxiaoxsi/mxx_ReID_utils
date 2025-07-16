@@ -35,6 +35,8 @@ src/mxx/dwpose/onnxdet.py
 src/mxx/dwpose/onnxpose.py
 src/mxx/dwpose/util.py
 src/mxx/dwpose/wholebody.py
+src/mxx/eval/FID.py
+src/mxx/eval/__init__.py
 src/mxx/utils/__init__.py
 src/mxx/utils/batch.py
 src/mxx/utils/check.py
