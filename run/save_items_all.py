@@ -15,7 +15,7 @@ def save_items_all(dataset, cfg):
             idx_vid=-1,
             dir_base=os.path.join(dir_ref, key),
             is_select_bernl=True,
-            rate_back = 1,
+            is_select_repeat=False,
         )
         print(f"img ref {key} saved!")
 

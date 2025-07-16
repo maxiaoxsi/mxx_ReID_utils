@@ -28,6 +28,7 @@ class ReIDDataset(Dataset):
         path_log="./log.txt",
         is_save=True,
         is_select_bernl=True,
+        is_select_repeat=True,
         rate_random_erase=0.5,
         rate_dropout_ref=0.2,
         rate_dropout_back=0.2,
@@ -46,6 +47,7 @@ class ReIDDataset(Dataset):
         self._stage=stage
         self._n_frame = n_frame
         self._is_select_bernl = is_select_bernl
+        self._is_select_repeat = is_select_repeat
         self._rate_random_erase = rate_random_erase
         self._rate_dropout_ref = rate_dropout_ref
         self._rate_dropout_back = rate_dropout_back
@@ -102,7 +104,8 @@ class ReIDDataset(Dataset):
             n_frame=self.n_frame,
             stage=self.stage,
             is_select_bernl = self.is_select_bernl,
-            rate_mask_aug = self.rate_mask_aug
+            is_select_repeat = self._is_select_repeat,
+            rate_mask_aug = self.rate_mask_aug,
         )
         seed = int(time.time())
         img_ref_tensor_list = self.get_img_tensor_list(
@@ -461,61 +464,6 @@ class ReIDDataset(Dataset):
         samples_pil = self.load_samples_pil_dict_from_dir(dir_sample, n_max)
         samples_tensor = self.get_samples_tensor_dict(samples_pil)
         return samples_tensor
-        # for dir in os.listdir(dir_sample):
-        #     dir_person = os.path.join(dir_sample, dir)
-        #     if not os.path.isdir(dir_person):
-        #         continue
-        #     img_reid_tensor = self.load_img_from_dir(
-        #         dir_person=dir_person,
-        #         type_transforms="reid",
-        #         img_size=(128, 256),
-        #     )
-        #     img_ref_tensor = self.load_img_from_dir(
-        #         dir_person=dir_person,
-        #         type_img="reid",
-        #         type_transforms="ref",
-        #         img_size=self._img_size,
-        #     )
-        #     img_background_tensor = self.load_img_from_dir(
-        #         dir_person=dir_person,
-        #         type_transforms="background",
-        #         img_size=self._img_size,
-        #     )
-        #     img_manikin_tensor = self.load_img_from_dir(
-        #         dir_person=dir_person,
-        #         type_transforms="manikin",
-        #         img_size=self._img_size,
-        #     )
-        #     img_skeleton_tensor = self.load_img_from_dir(
-        #         dir_person=dir_person,
-        #         type_transforms="skeleton",
-        #         img_size=self._img_size,
-        #     )
-        #     img_rgbguid_tensor = self.load_img_from_dir(
-        #         dir_person=dir_person,
-        #         type_transforms="rgbguid",
-        #         img_size=self._img_size,
-        #     )
-        #     text_ref_list = self.load_text_from_dir(
-        #         dir_person=dir_person,
-        #         type_list = "reid",
-        #     )
-        #     text_tgt_list = self.load_text_from_dir(
-        #         dir_person=dir_person,
-        #         type_list = "tgt",
-        #     )
-        #     sample = {
-        #         "img_ref_tensor": img_ref_tensor,
-        #         "img_reid_tensor": img_reid_tensor,
-        #         'img_manikin_tensor': img_manikin_tensor,
-        #         'img_skeleton_tensor': img_skeleton_tensor,
-        #         "img_rgbguid_tensor": img_rgbguid_tensor,
-        #         "img_background_tensor": img_background_tensor,
-        #         'text_ref_list': text_ref_list,
-        #         'text_tgt_list': text_tgt_list,
-        #     }
-        #     samples[dir_person] = sample
-        # return samples
 
     def load_img_tensor_from_pil(self, img_pil_list, type_transforms, img_size=(128, 256)):
         img_tensor_list = self.get_img_tensor_list(

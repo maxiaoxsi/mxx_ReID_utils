@@ -59,43 +59,45 @@ class ImgSet(SetBase):
         idx_img = idx_img % len(img_list)
         return img_list[idx_img]
 
-    def get_img_ref_list(self, annot_tgt, stage, is_select_bernl):
+    def get_img_ref_list_from_sorted_list(self, img_tgt, img_sorted_list_drns, is_select_bernl, is_select_repeat):
         img_ref_list = []
+        for drn in ["front", "back", "left", "right"]:
+            img_sorted_list = img_sorted_list_drns[drn]
+            from ..utils.sample.sample import select_img_bernl
+            img_ref = select_img_bernl(img_sorted_list, is_select_bernl)
+            if not is_select_repeat:
+                if img_ref is img_tgt:
+                    img_ref = None
+                    for img in img_sorted_list:
+                        if img is not img_tgt:
+                            img_ref = img
+                            break
+            img_ref_list.append(img_ref)
+        return img_ref_list
+            
+
+
+    def get_img_ref_list(self, img_tgt, stage, is_select_bernl, is_select_repeat):
+        annot_tgt = img_tgt.annot
         img_sorted_list_drns = {}
         for drn in ["front", "back", "left", "right"]:
             img_sorted_list = self.get_img_sorted_list(annot_tgt, drn)
             img_sorted_list_drns[drn] = img_sorted_list
-        for drn in ["front", "back", "left", "right"]:
-            img_sorted_list = img_sorted_list_drns[drn]
-            # if len(img_sorted_list) > 0:
-            #     img_standby = get_img_standby(img_ref_list, img_sorted_list)
-            #     if img_standby is not None:
-            #         img_ref = None
-            #         from ..utils.sample.sample import select_img_bernl
-            #         for i in range(7): 
-            #             img = select_img_bernl(img_sorted_list, is_select_bernl)
-            #             if img not in img_ref_list:
-            #                 img_ref = img
-            #                 break
-            #         if img_ref == None:
-            #             img_ref = img_standby
-            #         img_ref_list.append(img_ref)
-            #         continue 
-            # img_ref = None
-            # for drn_sub in ["front", "left", "right", "back"]:
-            #     img_sorted_list = img_sorted_list_drns[drn_sub]
-            #     if len(img_sorted_list) == 0:
-            #         continue
-            #     for img in img_sorted_list:
-            #         if img not in img_ref_list:
-            #             img_ref = img
-            #             break
-            #     if img_ref is not None:
-            #         break
-            from ..utils.sample.sample import select_img_bernl
-            img_ref = select_img_bernl(img_sorted_list, is_select_bernl)
-            img_ref_list.append(img_ref)
-            
+        img_ref_list = self.get_img_ref_list_from_sorted_list(
+            img_tgt=img_tgt, 
+            img_sorted_list_drns=img_sorted_list_drns, 
+            is_select_bernl=is_select_bernl, 
+            is_select_repeat=is_select_repeat,
+        )
+
+        if all(x is None for x in img_ref_list):
+            img_ref_list = self.get_img_ref_list_from_sorted_list(
+                img_tgt=img_tgt, 
+                img_sorted_list_drns=img_sorted_list_drns, 
+                is_select_bernl=False, 
+                is_select_repeat=True,
+            )
+        
         return img_ref_list, img_sorted_list_drns
 
     def get_img_sorted_list(self, annot_tgt, drn):

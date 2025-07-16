@@ -6,14 +6,15 @@ import yaml
 import random
 import torch
 
-def save_item(dataset, id_person, idx_vid, idx_img, dir_base, is_select_bernl, rate_back):
+def save_item(dataset, id_person, idx_vid, idx_img, dir_base, is_select_bernl, is_select_repeat):
     person = dataset._person_set[id_person]
     sample = person.get_sample(
         idx_vid=idx_vid,
         idx_img=idx_img,
         n_frame=dataset.n_frame,
         stage=dataset.stage,
-        is_select_bernl = is_select_bernl,
+        is_select_bernl=is_select_bernl,
+        is_select_repeat=is_select_repeat,
         rate_mask_aug=0,
     )
     img_ref_pil_list = sample["img_ref_pil_list"]

@@ -35,7 +35,7 @@ class Person:
         self._load_cache()
         return key in self._img_set
 
-    def get_sample(self, idx_vid, idx_img, n_frame, stage, is_select_bernl, rate_mask_aug):
+    def get_sample(self, idx_vid, idx_img, n_frame, stage, is_select_bernl, is_select_repeat, rate_mask_aug):
         """Get a sample from the person's imgSet or videoSet"""
         """stage1: img, text: visible infrared"""
         """stage2: video"""
@@ -51,7 +51,8 @@ class Person:
             idx_img=idx_img,
             n_frame=n_frame,
             stage=stage, 
-            is_select_bernl=is_select_bernl
+            is_select_bernl=is_select_bernl,
+            is_select_repeat=is_select_repeat,
         )
         from ..utils.data import get_annot_list, get_img_pil_list
         img_ref_pil_list = get_img_pil_list(img_ref_list, "reid")
@@ -84,7 +85,7 @@ class Person:
             'annot_tgt_list':annot_tgt_list
         }       
 
-    def get_img_list(self, idx_vid, idx_img, n_frame, stage, is_select_bernl):
+    def get_img_list(self, idx_vid, idx_img, n_frame, stage, is_select_bernl, is_select_repeat):
         img_tgt_list = self.get_img_tgt_list(
             idx_vid=idx_vid,
             idx_img=idx_img,
@@ -92,11 +93,13 @@ class Person:
             stage=stage,
         )
         annot_tgt = img_tgt_list[0].annot
+        img_tgt = img_tgt_list[0]
         
         img_ref_list, img_sorted_list_drns = self.get_img_ref_list(
-            annot_tgt=annot_tgt, 
+            img_tgt=img_tgt,
             stage=stage, 
             is_select_bernl=is_select_bernl,
+            is_select_repeat=is_select_repeat,
         )
         return img_tgt_list, img_ref_list, img_sorted_list_drns
 
@@ -107,8 +110,8 @@ class Person:
         )
         return [img_tgt]
     
-    def get_img_ref_list(self, annot_tgt, stage, is_select_bernl):
-        return self._img_set.get_img_ref_list(annot_tgt, stage, is_select_bernl)
+    def get_img_ref_list(self, img_tgt, stage, is_select_bernl, is_select_repeat):
+        return self._img_set.get_img_ref_list(img_tgt, stage, is_select_bernl, is_select_repeat)
     
     def __getitem__(self, idx):
         return self._img_set[idx]
