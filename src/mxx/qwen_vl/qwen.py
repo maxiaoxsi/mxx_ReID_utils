@@ -6,13 +6,13 @@ processor_qwen = None
 def load_qwen():
     from transformers import Qwen2_5_VLForConditionalGeneration, AutoProcessor
     model_qwen = Qwen2_5_VLForConditionalGeneration.from_pretrained(
-        "/machangxiao/hub/Qwen2.5-VL-7B-Instruct", 
+        "/root/autodl-fs/hub/Qwen2.5-VL-7B-Instruct", 
         torch_dtype="auto", 
-        device_map="cuda"
-    )
+        # device_map="cuda"
+    ).to("cuda")
 
     processor_qwen = AutoProcessor.from_pretrained(
-        "/machangxiao/hub/Qwen2.5-VL-7B-Instruct", 
+        "/root/autodl-fs/hub/Qwen2.5-VL-7B-Instruct", 
         use_fast=False
     )
     return model_qwen, processor_qwen

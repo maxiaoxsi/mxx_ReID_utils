@@ -10,7 +10,7 @@ def annot_vl(idx_annot, data_list, keys_text, cfg, logger):
         dir_sub = get_dir_sub(root, cfg)
         basename, ext = get_basename(file) 
         try:
-            if int(file.split("_")[0]) <= 0:
+            if int(file.split(".")[0].split("_")[0]) <= 0:
                 continue
         except:
             continue

@@ -37,6 +37,10 @@ src/mxx/dwpose/util.py
 src/mxx/dwpose/wholebody.py
 src/mxx/eval/FID.py
 src/mxx/eval/__init__.py
+src/mxx/smplx/__init__.py
+src/mxx/smplx/painter.py
+src/mxx/smplx/para.py
+src/mxx/smplx/smplx.py
 src/mxx/utils/__init__.py
 src/mxx/utils/batch.py
 src/mxx/utils/check.py

@@ -8,7 +8,7 @@ def annot_width(args):
     (cfg, root, file, logger) = args
     if not check_is_file_img(file):
         return
-    if int(file.split('_')[0]) <= 0:
+    if int(file.split('.')[0].split('_')[0]) <= 0:
         return
     dir_sub = get_dir_sub(root, cfg)
     basename, ext = get_basename(file)
