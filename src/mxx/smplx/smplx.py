@@ -58,6 +58,38 @@ def load_smplx(path_smplx_model):
     ]
     return model_smplx, kps_lines
 
+def render_manikin(param, path_img, path_manikin):
+    global model_smplx
+    if model_smplx is None:
+        model_smplx, kps_lines = load_smplx(
+            path_smplx_model = '/machangxiao/code/SMPLest-X/human_models/human_model_files'
+            #'/machangxiao/code/smplx/models'
+        )
+    output = model_smplx(
+        betas=param["betas"].to("cuda"), 
+        expression=param["expression"].to("cuda"),
+        body_pose=param["body_pose"].to("cuda"),
+        global_orient=param["global_orient"].to("cuda"),
+        left_hand_pose=param["left_hand_pose"].to("cuda"),
+        right_hand_pose=param["right_hand_pose"].to("cuda"),
+        jaw_pose=param["jaw_pose"].to("cuda"),
+        leye_pose=param["leye_pose"].to("cuda"),
+        reye_pose=param["reye_pose"].to("cuda"),
+        transl=param["transl"].to("cuda"),
+        return_verts=True
+    )
+    vertices = output.vertices.detach().cpu().numpy().squeeze()
+    img = cv2.imread(path_img)
+    img_black = img.copy()
+    img_black[:, :, :] = 0
+    img_manikin = render_mesh(img_black, vertices, model_smplx.faces, 
+        {'focal': param['focal'], 'princpt': param['princpt']}, 
+        mesh_as_vertices=False)
+    dirname_manikin = os.path.dirname(path_manikin)
+    if not os.path.exists(dirname_manikin):
+        os.makedirs(dirname_manikin, exist_ok=True)
+    cv2.imwrite(path_manikin, img_manikin[:, :, ::-1])
+
 
 def render_skeleton(args):
     global model_smplx, kps_lines

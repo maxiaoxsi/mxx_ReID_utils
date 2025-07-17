@@ -125,7 +125,9 @@ class Img:
         # a visible photo of a people wearing red t-shirt and dark shorts, with a backpack,
         return text
     
-
+    def get_path(self, type_path):
+        return get_path(self.dir, self.dir_sub, self.basename, self.ext, type_path)
+    
 
 
 

@@ -25,6 +25,7 @@ def get_smplx_data(path_pred):
     return ans
 
  # 使用四元数球面线性插值处理全局旋转
+
 def slerp_rotation(rot1, rot2, alpha):
     """使用四元数slerp进行旋转插值"""
     # 将pytorch tensor转换为numpy并展平
@@ -88,8 +89,6 @@ def interpolate_smplx_params(para1, para2, alpha):
     interpolated['global_orient'] = slerp_rotation(global_orient1, global_orient2, alpha)
     
     return interpolated
-  
-
 
 class Painter:
     def __init__(self, path_smplx_model):

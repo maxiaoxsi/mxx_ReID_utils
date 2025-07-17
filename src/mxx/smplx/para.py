@@ -6,6 +6,8 @@ def get_params_smplx(path_pred):
     ans = {}
     ans['betas'] = torch.from_numpy(data_load['smplx_shape']).float()      # [1, num_betas]
     ans['expression'] = torch.from_numpy(data_load['smplx_expr']).float()  # [1, num_expression_coeffs]
+    
+    ans['transl'] = torch.from_numpy(data_load['cam_trans']).float()
     ans['global_orient'] = torch.from_numpy(data_load['smplx_root_pose']).float()  # [1, 3]
     ans['body_pose'] = torch.from_numpy(data_load['smplx_body_pose']).unsqueeze(0).float() # [1, 21*3] 或 [1, 21, 3]
     ans['left_hand_pose']=torch.from_numpy(data_load['smplx_lhand_pose']).unsqueeze(0).float()
@@ -13,7 +15,7 @@ def get_params_smplx(path_pred):
     ans['jaw_pose']=torch.from_numpy(data_load['smplx_jaw_pose']).float()
     ans['leye_pose']=torch.from_numpy(data_load['smplx_leye_pose']).float()
     ans['reye_pose']=torch.from_numpy(data_load['smplx_reye_pose']).float()
-    ans['transl'] = torch.from_numpy(data_load['cam_trans']).float()
+    
     ans['focal'] = data_load['focal'].tolist()
     ans['princpt'] = data_load['princpt'].tolist()
     return ans
@@ -38,3 +40,29 @@ def combine_smplx_params(params_shape, params_pose):
     params_combined['princpt'] = params_pose['princpt']
     
     return params_combined
+
+from sklearn.preprocessing import StandardScaler
+from sklearn.covariance import MinCovDet
+import numpy as np
+
+def get_params_betas_mean(params_list):
+    if len(params_list) <= 3:
+        betas_matrix = np.vstack([param["betas"] for param in params_list])
+        avg_betas = np.mean(betas_matrix, axis=0)
+        return avg_betas
+    
+    betas_matrix = np.vstack([param["betas"] for param in params_list])
+    scaler = StandardScaler()
+    betas_normalized = scaler.fit_transform(betas_matrix)
+    robust_cov = MinCovDet().fit(betas_normalized)
+    mahalanobis_dist = robust_cov.mahalanobis(betas_normalized)
+    inliers = mahalanobis_dist < np.percentile(mahalanobis_dist, 95)
+    avg_betas = np.mean(betas_matrix[inliers], axis=0)
+    return avg_betas
+    
+    
+    for param in params_list:
+        betas_normalized_list.append(scaler.fit_transform(param["betas"]))
+    robust_cov = MinCovDet().fit(betas_normalized)
+    mahalanobis_dist = robust_cov.mahalanobis(betas_normalized)
+    inliers = mahalanobis_dist < np.percentile(mahalanobis_dist, 95)
