@@ -7,7 +7,8 @@ def load_cfg(path_cfg, is_check=True):
     cfg = load_cfg(path_cfg)
     if is_check:
         check_cfg_dir(cfg['dir']['reid'])
-        check_cfg_dir(cfg['dir']['smplx'])
+        check_cfg_dir(cfg['dir']['pred'])
+        check_cfg_dir(cfg['dir']['manikin'])
         # check_cfg_dir(cfg['dir']['annot'])
         # check_cfg_dir(cfg['dir']['mask'])
     return cfg
@@ -24,8 +25,6 @@ def get_dirname_base(key, dir_base):
     if isinstance(dir_base, dict):
         if "dir" in dir_base:
             dir_base = dir_base["dir"]
-        if key in ["pred", "manikin"]:
-            key = "smplx"
         if key in dir_base:
             dir_base = dir_base[key]
             return dir_base
@@ -35,12 +34,6 @@ def get_dirname_base(key, dir_base):
         return dir_base
     else:
         raise Exception("can't get basename")
-
-def get_dir_ext(key):
-    if key in ["manikin", "pred"]:
-        return key
-    else:
-        return ""
 
 def get_dirname_rgbguid(dir_base, dir_sub, basename):
     dir_base = get_dirname_base("rgbguid", dir_base)
@@ -66,9 +59,8 @@ def get_path(dir_base, dir_sub, basename, ext, key):
         dirname_rgbguid = get_dirname_rgbguid(dir_base, dir_sub, basename)
         return get_path_rgbguid(dirname_rgbguid)
     dir_base = get_dirname_base(key, dir_base)
-    dir_ext = get_dir_ext(key)
     ext = get_ext(key, ext)
-    return os.path.join(dir_base, dir_sub, dir_ext, f"{basename}.{ext}")
+    return os.path.join(dir_base, dir_sub, f"{basename}.{ext}")
 
 def get_basename(name_file):
     basename = name_file.split('.')[0]

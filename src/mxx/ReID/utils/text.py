@@ -26,6 +26,20 @@ def get_text_drn(img):
         return f', {text_walk} away from the camera'
     return f', {text_walk} {drn}'
 
+def get_text_drn_from_drn(drn):
+    if drn == "left":
+        return 'walking from right to left'
+    elif drn == "right":
+        return 'walking from left to right'
+    elif drn == 'front':
+        return 'walking toward the camera'
+    elif drn == 'back':
+        return 'walking away from the camera'
+    else:
+        raise Exception("drn wrong!")
+
+
+
 def get_text_drn_from_text(text):
     if 'riding' in text:
         text_walking = 'riding'

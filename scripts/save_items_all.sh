@@ -4,4 +4,4 @@ PATH_CFG_DUKE=/machangxiao/code/MIP-ReID/configs/datasets/DukeMTMC-reID/cfg_cach
 PATH_CFG_MSMT=/machangxiao/code/MIP-ReID/configs/datasets/MSMT17/cfg_cache_msmt17_train.yaml
 
 python run/save_items_all.py \
-    --path_cfg $PATH_CFG_MARKET 
+    --path_cfg $PATH_CFG_MARS 

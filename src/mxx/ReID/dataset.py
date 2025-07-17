@@ -152,6 +152,10 @@ class ReIDDataset(Dataset):
             seed=seed, 
             img_size=self._img_size,
         )
+        for i in range(len(img_background_tensor_list)):
+            if i != 0:
+                img_background_tensor_list[i] = torch.zeros_like(img_background_tensor_list[i])
+                
 
         (
             img_ref_tensor, 
@@ -339,6 +343,10 @@ class ReIDDataset(Dataset):
         return self._type
 
     @property
+    def img_size(self):
+        return self._img_size
+
+    @property
     def dir(self):
         return self._dir
     
@@ -501,11 +509,17 @@ class ReIDDataset(Dataset):
             if not path.endswith((".jpg", ".png", ".jpeg")):
                 continue
             path_img = os.path.join(dir_img, path)
-            img_pil = Image.open(path_img)
-            if len(set(img_pil.getdata())) == 1:
-                img_pil = None
+            img_pil = self.load_img_pil_from_path(path_img)
             img_pil_list.append(img_pil)
         return img_pil_list
+
+    def load_img_pil_from_path(self, path_img):
+        img_pil = Image.open(path_img)
+        if len(set(img_pil.getdata())) == 1:
+                img_pil = None
+        return img_pil
+
+        
 
     def get_img_tensor(self, img_pil_list, type_transforms, img_size):
         img_tensor_list = self.get_img_tensor_list(
