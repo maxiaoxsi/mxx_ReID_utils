@@ -12,3 +12,6 @@ def get_id_person_min():
 
 def get_type_dataset():
     return 'img'
+
+def get_key(basename, dir_sub):
+    return basename

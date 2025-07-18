@@ -8,7 +8,9 @@ def load_cfg(path_cfg, is_check=True):
     if is_check:
         check_cfg_dir(cfg['dir']['reid'])
         check_cfg_dir(cfg['dir']['pred'])
-        check_cfg_dir(cfg['dir']['manikin'])
+
+        # check_cfg_dir(cfg['dir']['annot'])
+        # check_cfg_dir(cfg['dir']['manikin'])
         # check_cfg_dir(cfg['dir']['annot'])
         # check_cfg_dir(cfg['dir']['mask'])
     return cfg

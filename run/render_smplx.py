@@ -2,11 +2,11 @@ import argparse
 from mxx.utils.batch import process_reid_batch
 
 def render_smplx(path_cfg, batch_size, max_workers):
-    from mxx.smplx.utils.render import render_skeleton
+    from mxx.smplx.utils.render import render_skeleton, render_manikin
     process_reid_batch(
         path_cfg=path_cfg,
-        name_processing="render skeleton",
-        method=render_skeleton,
+        name_processing="render manikin",
+        method=render_manikin,
         batch_size=batch_size,
         max_workers=max_workers,
     )

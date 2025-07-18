@@ -1,5 +1,5 @@
-def load_id_person(name_person, sub_dir=None):
-    return name_person.split('_')[0]
+def load_id_person(name_person, dir_sub):
+    return dir_sub.split('/')[-1]
 
 def load_id_video(name_person):
     return None
@@ -14,4 +14,6 @@ def get_type_dataset():
     return 'img'
 
 def get_key(basename, dir_sub):
-    return basename
+    id_cam = dir_sub.split('/')[-2]
+    return f'{id_cam}_{basename}'
+

@@ -14,13 +14,12 @@ from ..utils.path import get_path
 class Img:
     def __init__(
         self,
-        basename,
         cache,
         dataset, 
         person, 
         logger, 
     ) -> None:
-        self._basename = basename
+        self._basename = cache["basename"]
         self._dir_sub = cache["dir_sub"]
         self._is_smplx = cache["is_smplx"]
         self._dataset = dataset
@@ -100,17 +99,8 @@ class Img:
                 self._score += 1
     
     def get_text_tgt(self):
-        text_ref = self.get_text_ref()
-        text_ref = text_ref[:len(text_ref) - 1]
         from ..utils.text import get_text_backpack, get_text_hand_carried
         from ..utils.text import get_text_drn
-        text_backpack = get_text_backpack(self)
-        text_hand_carried = get_text_hand_carried(self)
-        text_drn = get_text_drn(self)
-        text = f'{text_ref}{text_backpack}{text_hand_carried}{text_drn}.'
-        return text
-
-    def get_text_ref(self):
         is_visible = self["is_visible"]
         annot_upper = self["upper"]
         annot_bottoms = self["bottoms"]
@@ -121,8 +111,10 @@ class Img:
         else:
             str_visible = 'visible'
             self._logger(f'[img] annot visible wrong: {is_visible}')
-        text = f'a {str_visible} photo of a people wearing {annot_upper} and {annot_bottoms}.'
-        # a visible photo of a people wearing red t-shirt and dark shorts, with a backpack,
+        text_backpack = get_text_backpack(self)
+        text_hand_carried = get_text_hand_carried(self)
+        text_drn = get_text_drn(self)
+        text = f'a {str_visible} photo of a people wearing {annot_upper} and {annot_bottoms}{text_backpack}{text_hand_carried}{text_drn}.'
         return text
     
     def get_path(self, type_path):

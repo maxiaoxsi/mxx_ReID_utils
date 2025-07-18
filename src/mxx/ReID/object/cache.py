@@ -32,7 +32,7 @@ def add_person_vid(person_dict, id_person, dir_sub, id_vid, id_frame, is_smplx):
         person_dict[id_person] = person
     add_vid(person, dir_sub, id_vid, id_frame, is_smplx)
 
-def add_person_img(person_dict, id_person, dir_sub, basename, is_smplx):
+def add_person_img(person_dict, id_person, dir_sub, basename, key, is_smplx):
     if id_person in person_dict:
         person = person_dict[id_person]
     else:
@@ -40,7 +40,8 @@ def add_person_img(person_dict, id_person, dir_sub, basename, is_smplx):
         person = {}
         person_dict[id_person] = person
     
-    person[basename] = {
+    person[key] = {
+        'basename':basename,
         'dir_sub':dir_sub,
         'is_smplx':is_smplx,
     }
@@ -97,7 +98,7 @@ class Cache:
                 basename, ext = get_basename(name_file=file)
                 id_person = parser.load_id_person(basename, dir_sub)
                 if not id_person.isdigit() or int(id_person) < id_person_min:
-                    continue
+                    continue                
                 path_annot = get_path(self._dir, dir_sub, basename, ext, "annot")
                 path_manikin = get_path(self._dir, dir_sub, basename, ext, "manikin")
                 from ...annot.annot_base import AnnotBase
@@ -111,7 +112,8 @@ class Cache:
                 else:
                     is_smplx = os.path.exists(path_manikin)
                     annot.set_annot('is_smplx', is_smplx)
-                add_person_img(person_dict, id_person, dir_sub, basename, is_smplx)
+                key = parser.get_key(basename, dir_sub)
+                add_person_img(person_dict, id_person, dir_sub, basename, key, is_smplx)
         self._cache['type'] = 'img'
         self._cache['ext'] = ext
         self._cache['person'] = person_dict 

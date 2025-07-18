@@ -20,15 +20,14 @@ class Person:
         if self._img_set is not None:
             return
         self._img_set = ImgSet()
-        for basename, cache_img in self._cache.items():
+        for key, cache_img in self._cache.items():
             img = Img(
-                basename=basename,
                 cache=cache_img,
                 dataset=self._dataset,
                 person=self,
                 logger=self._logger
             )
-            self._img_set.add_item(basename, img)
+            self._img_set.add_item(key, img)
         del self._cache
 
     def __contains__(self, key):
@@ -59,12 +58,12 @@ class Person:
         img_tgt_pil_list = get_img_pil_list(img_tgt_list, "reid")
         img_manikin_pil_list = get_img_pil_list(img_tgt_list, "manikin")
         img_skeleton_pil_list = get_img_pil_list(img_tgt_list, "skeleton")
-        img_rgbguid_pil_list = get_img_pil_list(img_tgt_list, "rgbguid")
+        img_rgbguid_pil_list = get_img_pil_list(img_tgt_list, "reid")
         img_mask_pil_list = get_img_pil_list(img_tgt_list, "mask")
         img_foreground_pil_list = get_img_pil_list(img_tgt_list, "foreground")
         img_background_pil_list = get_img_pil_list(img_tgt_list, "background", rate_mask_aug)
         
-        text_ref = img_tgt_list[0].get_text_ref()
+        text_ref = ''
         text_tgt = img_tgt_list[0].get_text_tgt()
 
         annot_ref_list = get_annot_list(img_ref_list)

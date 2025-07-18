@@ -21,9 +21,9 @@ class Video:
             cache = {
                 "dir_sub":self.dir_sub,
                 "is_smplx":(idx + 1) not in self._frame_without_smplx_list,
+                "basename":self.get_basename(idx + 1),
             }
             img = Img(
-                basename=self.get_basename(idx + 1),
                 cache=cache,
                 dataset = self._dataset,
                 person=self._person,

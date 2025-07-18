@@ -1,4 +1,4 @@
-def load_id_person(name_person, sub_dir):
+def load_id_person(name_person, dir_sub):
     return name_person.split('_')[0]
 
 def load_id_video(name_person):
@@ -12,4 +12,7 @@ def get_id_person_min():
 
 def get_type_dataset():
     return 'img'
+
+def get_key(basename, dir_sub):
+    return basename
 

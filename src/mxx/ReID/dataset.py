@@ -152,6 +152,7 @@ class ReIDDataset(Dataset):
             seed=seed, 
             img_size=self._img_size,
         )
+        # only first frame with background
         for i in range(len(img_background_tensor_list)):
             if i != 0:
                 img_background_tensor_list[i] = torch.zeros_like(img_background_tensor_list[i])
