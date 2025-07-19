@@ -62,7 +62,11 @@ class Person:
         img_mask_pil_list = get_img_pil_list(img_tgt_list, "mask")
         img_foreground_pil_list = get_img_pil_list(img_tgt_list, "foreground")
         img_background_pil_list = get_img_pil_list(img_tgt_list, "background", rate_mask_aug)
-        
+        for i in range(len(img_manikin_pil_list)):
+            if i != 0:
+                img_rgbguid_pil_list[i] = None
+                img_skeleton_pil_list[i] = None
+                img_background_pil_list[i] = None
         text_ref = ''
         text_tgt = img_tgt_list[0].get_text_tgt()
 

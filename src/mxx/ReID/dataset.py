@@ -152,12 +152,7 @@ class ReIDDataset(Dataset):
             seed=seed, 
             img_size=self._img_size,
         )
-        # only first frame with background
-        for i in range(len(img_background_tensor_list)):
-            if i != 0:
-                img_background_tensor_list[i] = torch.zeros_like(img_background_tensor_list[i])
-                
-
+        
         (
             img_ref_tensor, 
             img_reid_tensor
@@ -407,7 +402,7 @@ class ReIDDataset(Dataset):
     def load_samples_pil_dict_from_dir(self, dir_sample, n_max=-1):
         samples = {}
         i = 0
-        for dir in os.listdir(dir_sample):
+        for dir in sorted(os.listdir(dir_sample)):
             if n_max != -1 and i > n_max:
                 return samples
             dir_person = os.path.join(dir_sample, dir)

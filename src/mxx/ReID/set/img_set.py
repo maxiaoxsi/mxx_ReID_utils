@@ -39,8 +39,7 @@ class ImgSet(SetBase):
             self._list_cond['tgt'].append(item)
             if not item['is_visible']:
                 self._list_cond['infrared'].append(item)
-                if random.random() < 0.4:
-                    continue
+                continue
             if item['drn'] == 'left':
                 self._list_cond['left'].append(item)
             elif item['drn'] == 'right':
@@ -57,7 +56,7 @@ class ImgSet(SetBase):
         if stage in [1, 2, 4]:
             img_list = self.get_list_cond('tgt')
             img_infrared_list = self.get_list_cond('infrared')
-            if len(img_infrared_list) > 0 and random.random() < 0.5:
+            if len(img_infrared_list) > 0:
                 img_list = img_infrared_list
         if len(img_list) == 0:
             raise Exception("img_set: img_list empty!")
